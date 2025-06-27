@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="12ab46a8-f0ab-4ea0-bd8c-6e5dda149148" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dockerfile" />
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../Program Files/Go" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2z02SfXQXRzNgKMjoMGW1zOTyU0" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "Go Test.BenchmarkCORSMiddleware in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.BenchmarkGetStakeHistory in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.BenchmarkHealthCheck in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.BenchmarkMockSuiClient_ExternalPayWinner in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.BenchmarkMockSuiClient_ExternalStake in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.BenchmarkMockSuiClient_GetBalance in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.BenchmarkMockSuiClient_GetCoins in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.BenchmarkRequestIDMiddleware in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.BenchmarkSecurityHeadersMiddleware in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.BenchmarkStakeGameRoute in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestAPIInfoEndpoint in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestContentTypeValidation in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestGetGameHistoryRoute_InvalidAddress in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestGetGameHistoryRoute_Success in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestGetGameStatsRoute in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestGetStakeHistoryRoute_InvalidAddress in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestGetStakeHistoryRoute_Success in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestHealthCheckEndpoint in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMethodNotAllowedHandler in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMiddlewareIntegration in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_BuildTransactionBlock in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_Concurrent in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_CustomFunctions in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_EdgeCases in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_ErrorHandling in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_ExecuteTransactionBlock in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_ExternalPayWinner in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_ExternalStake in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_GetBalance in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_GetCoins in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_GetTransactionBlock in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_HelperMethods in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_MemoryManagement in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_StateConsistency in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_TransactionDataIntegrity in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestNotFoundHandler in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestPayWinnerRoute_Success in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestPayWinnerRoute_ValidationErrors in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestRequestValidationEdgeCases in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestRootEndpoint in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestStakeGameRoute_InvalidJSON in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestStakeGameRoute_Success in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestStakeGameRoute_ValidationErrors in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestStatusEndpoint in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestSuccessResponseFormat in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.go test jollfi-gaming-api/internal/tests (1).executor": "Run",
+    "Go Test.go test jollfi-gaming-api/internal/tests.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "go.import.settings.migrated": "true",
+    "last_opened_file_path": "C:/Users/DELL/GolandProjects",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "C:/Users/DELL/Desktop/jollofi-external-api/main.go"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\DELL\Desktop\jollofi-external-api\tests\integration" />
+      <recent name="C:\Users\DELL\Desktop\jollofi-external-api\cmd\server" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Go Test.go test jollfi-gaming-api/internal/tests (1)">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <working_directory value="$PROJECT_DIR$" />
+      <go_parameters value="-i" />
+      <kind value="DIRECTORY" />
+      <directory value="$USER_HOME$/GolandProjects" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestContentTypeValidation in jollfi-gaming-api/internal/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="jollofi-external-api" />
+      <working_directory value="$PROJECT_DIR$/internal/tests" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="jollfi-gaming-api/internal/tests" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestContentTypeValidation\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestRequestValidationEdgeCases in jollfi-gaming-api/internal/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="jollofi-external-api" />
+      <working_directory value="$PROJECT_DIR$/internal/tests" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="jollfi-gaming-api/internal/tests" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestRequestValidationEdgeCases\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestSuccessResponseFormat in jollfi-gaming-api/internal/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="jollofi-external-api" />
+      <working_directory value="$PROJECT_DIR$/internal/tests" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="jollfi-gaming-api/internal/tests" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestSuccessResponseFormat\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test jollfi-gaming-api/internal/tests (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="jollofi-external-api" />
+      <working_directory value="$PROJECT_DIR$/internal/tests" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="jollfi-gaming-api/internal/tests" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test jollfi-gaming-api/internal/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="jollofi-external-api" />
+      <working_directory value="$PROJECT_DIR$/internal/tests" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="jollfi-gaming-api/internal/tests" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Test.go test jollfi-gaming-api/internal/tests (1)" />
+        <item itemvalue="Go Test.go test jollfi-gaming-api/internal/tests" />
+        <item itemvalue="Go Test.TestRequestValidationEdgeCases in jollfi-gaming-api/internal/tests" />
+        <item itemvalue="Go Test.TestSuccessResponseFormat in jollfi-gaming-api/internal/tests" />
+        <item itemvalue="Go Test.TestContentTypeValidation in jollfi-gaming-api/internal/tests" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-gosdk-5df93f7ad4aa-dfc284eb1eb8-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-242.20224.424" />
+        <option value="bundled-js-predefined-d6986cc7102b-410509235cf1-JavaScript-GO-242.20224.424" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/cmd/server/main.go</url>
+          <line>19</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
