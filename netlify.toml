@@ -1,0 +1,10 @@
+[build]
+  command = "GOOS=linux GOARCH=amd64 go build -o functions/api/main ./functions/api"
+  functions = "functions"
+  publish = "public"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
