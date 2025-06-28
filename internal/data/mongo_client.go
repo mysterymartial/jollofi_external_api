@@ -21,7 +21,6 @@ type MongoClient struct {
 	dbName   string
 }
 
-// Game represents the game document structure
 type Game struct {
 	ID                primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	RequesterAddress  string             `bson:"requester_address" json:"requester_address"`
@@ -39,7 +38,6 @@ type Game struct {
 	CompletedAt       *time.Time         `bson:"completed_at,omitempty" json:"completed_at,omitempty"`
 }
 
-// User represents the user document structure
 type User struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	Address   string             `bson:"address" json:"address"`
@@ -51,16 +49,15 @@ type User struct {
 	LastSeen  time.Time          `bson:"last_seen" json:"last_seen"`
 }
 
-// Transaction represents the transaction document structure
 type Transaction struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	GameID      primitive.ObjectID `bson:"game_id" json:"game_id"`
-	Type        string             `bson:"type" json:"type"` // "stake", "payout", "refund"
+	Type        string             `bson:"type" json:"type"`
 	FromAddress string             `bson:"from_address" json:"from_address"`
 	ToAddress   string             `bson:"to_address,omitempty" json:"to_address,omitempty"`
 	Amount      uint64             `bson:"amount" json:"amount"`
 	TxDigest    string             `bson:"tx_digest" json:"tx_digest"`
-	Status      string             `bson:"status" json:"status"` // "pending", "confirmed", "failed"
+	Status      string             `bson:"status" json:"status"`
 	BlockHeight *uint64            `bson:"block_height,omitempty" json:"block_height,omitempty"`
 	CreatedAt   time.Time          `bson:"created_at" json:"created_at"`
 	ConfirmedAt *time.Time         `bson:"confirmed_at,omitempty" json:"confirmed_at,omitempty"`
@@ -95,7 +92,6 @@ func NewMongoClient(mongoURI string, dbName string) *MongoClient {
 		dbName:   dbName,
 	}
 
-	// Create indexes
 	if err := mongoClient.createIndexes(ctx); err != nil {
 		log.Printf("Warning: Failed to create indexes: %v", err)
 	}
@@ -103,15 +99,11 @@ func NewMongoClient(mongoURI string, dbName string) *MongoClient {
 	return mongoClient
 }
 
-// Interface method implementations
-
-// GetDatabase implements interfaces.MongoClientInterface - THIS FIXES THE ERROR
 func (m *MongoClient) GetDatabase(name string) interfaces.MongoDatabaseInterface {
 	database := m.client.Database(name)
 	return &MongoDatabase{database: database}
 }
 
-// Close implements interfaces.MongoClientInterface
 func (m *MongoClient) Close() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -120,23 +112,19 @@ func (m *MongoClient) Close() {
 	}
 }
 
-// Ping implements interfaces.MongoClientInterface
 func (m *MongoClient) Ping(ctx context.Context) error {
 	return m.client.Ping(ctx, readpref.Primary())
 }
 
-// Legacy method for backward compatibility
 func (m *MongoClient) PingLegacy() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	return m.client.Ping(ctx, readpref.Primary())
 }
 
-// CreateGame implements interfaces.MongoClientInterface
 func (m *MongoClient) CreateGame(ctx context.Context, game interface{}) (string, error) {
 	collection := m.database.Collection("games")
 
-	// Convert interface{} to Game struct if needed
 	var gameDoc Game
 	switch g := game.(type) {
 	case Game:
@@ -144,7 +132,6 @@ func (m *MongoClient) CreateGame(ctx context.Context, game interface{}) (string,
 	case *Game:
 		gameDoc = *g
 	case map[string]interface{}:
-		// Convert map to Game struct
 		gameDoc = Game{
 			RequesterAddress: getStringFromMap(g, "requester_address"),
 			AccepterAddress:  getStringFromMap(g, "accepter_address"),
@@ -159,7 +146,6 @@ func (m *MongoClient) CreateGame(ctx context.Context, game interface{}) (string,
 		return "", fmt.Errorf("unsupported game type: %T", game)
 	}
 
-	// Set timestamps if not already set
 	if gameDoc.CreatedAt.IsZero() {
 		gameDoc.CreatedAt = time.Now()
 	}
@@ -179,7 +165,6 @@ func (m *MongoClient) CreateGame(ctx context.Context, game interface{}) (string,
 	return fmt.Sprintf("%v", result.InsertedID), nil
 }
 
-// GetGame implements interfaces.MongoClientInterface
 func (m *MongoClient) GetGame(ctx context.Context, gameID string) (interface{}, error) {
 	collection := m.database.Collection("games")
 
@@ -200,7 +185,6 @@ func (m *MongoClient) GetGame(ctx context.Context, gameID string) (interface{}, 
 	return game, nil
 }
 
-// UpdateGame implements interfaces.MongoClientInterface
 func (m *MongoClient) UpdateGame(ctx context.Context, gameID string, updates interface{}) error {
 	collection := m.database.Collection("games")
 
@@ -209,7 +193,6 @@ func (m *MongoClient) UpdateGame(ctx context.Context, gameID string, updates int
 		return fmt.Errorf("invalid game ID format: %v", err)
 	}
 
-	// Prepare update document
 	var updateDoc bson.M
 	switch u := updates.(type) {
 	case bson.M:
@@ -234,7 +217,6 @@ func (m *MongoClient) UpdateGame(ctx context.Context, gameID string, updates int
 		return fmt.Errorf("unsupported update type: %T", updates)
 	}
 
-	// Always update the updated_at field
 	updateDoc["updated_at"] = time.Now()
 
 	filter := bson.M{"_id": objectID}
@@ -252,7 +234,6 @@ func (m *MongoClient) UpdateGame(ctx context.Context, gameID string, updates int
 	return nil
 }
 
-// GetGamesByStatus implements interfaces.MongoClientInterface
 func (m *MongoClient) GetGamesByStatus(ctx context.Context, status string) ([]interface{}, error) {
 	collection := m.database.Collection("games")
 
@@ -279,9 +260,6 @@ func (m *MongoClient) GetGamesByStatus(ctx context.Context, status string) ([]in
 	return games, nil
 }
 
-// GetGamesByAddress implements interfaces.MongoClientInterface
-
-// GetGamesByAddress implements interfaces.MongoClientInterface
 func (m *MongoClient) GetGamesByAddress(ctx context.Context, address string) ([]interface{}, error) {
 	collection := m.database.Collection("games")
 
@@ -292,7 +270,6 @@ func (m *MongoClient) GetGamesByAddress(ctx context.Context, address string) ([]
 		},
 	}
 
-	// Sort by created_at descending
 	opts := options.Find().SetSort(bson.D{{"created_at", -1}})
 	cursor, err := collection.Find(ctx, filter, opts)
 	if err != nil {
@@ -316,11 +293,9 @@ func (m *MongoClient) GetGamesByAddress(ctx context.Context, address string) ([]
 	return games, nil
 }
 
-// CreateTransaction implements interfaces.MongoClientInterface
 func (m *MongoClient) CreateTransaction(ctx context.Context, transaction interface{}) (string, error) {
 	collection := m.database.Collection("transactions")
 
-	// Convert interface{} to Transaction struct if needed
 	var txDoc Transaction
 	switch tx := transaction.(type) {
 	case Transaction:
@@ -328,7 +303,6 @@ func (m *MongoClient) CreateTransaction(ctx context.Context, transaction interfa
 	case *Transaction:
 		txDoc = *tx
 	case map[string]interface{}:
-		// Convert map to Transaction struct
 		gameID, _ := primitive.ObjectIDFromHex(getStringFromMap(tx, "game_id"))
 		txDoc = Transaction{
 			GameID:      gameID,
@@ -344,7 +318,6 @@ func (m *MongoClient) CreateTransaction(ctx context.Context, transaction interfa
 		return "", fmt.Errorf("unsupported transaction type: %T", transaction)
 	}
 
-	// Set timestamps if not already set
 	if txDoc.CreatedAt.IsZero() {
 		txDoc.CreatedAt = time.Now()
 	}
@@ -361,7 +334,6 @@ func (m *MongoClient) CreateTransaction(ctx context.Context, transaction interfa
 	return fmt.Sprintf("%v", result.InsertedID), nil
 }
 
-// GetTransactionsByGameID implements interfaces.MongoClientInterface
 func (m *MongoClient) GetTransactionsByGameID(ctx context.Context, gameID string) ([]interface{}, error) {
 	collection := m.database.Collection("transactions")
 
@@ -395,13 +367,9 @@ func (m *MongoClient) GetTransactionsByGameID(ctx context.Context, gameID string
 	return transactions, nil
 }
 
-// Additional utility methods
-
-// CreateUser creates a new user document
 func (m *MongoClient) CreateUser(ctx context.Context, user User) (string, error) {
 	collection := m.database.Collection("users")
 
-	// Set timestamps
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
 	user.LastSeen = time.Now()
@@ -418,7 +386,6 @@ func (m *MongoClient) CreateUser(ctx context.Context, user User) (string, error)
 	return fmt.Sprintf("%v", result.InsertedID), nil
 }
 
-// GetUser retrieves a user by address
 func (m *MongoClient) GetUser(ctx context.Context, address string) (*User, error) {
 	collection := m.database.Collection("users")
 
@@ -434,7 +401,6 @@ func (m *MongoClient) GetUser(ctx context.Context, address string) (*User, error
 	return &user, nil
 }
 
-// UpdateUser updates user information
 func (m *MongoClient) UpdateUser(ctx context.Context, address string, updates bson.M) error {
 	collection := m.database.Collection("users")
 
@@ -454,12 +420,10 @@ func (m *MongoClient) UpdateUser(ctx context.Context, address string, updates bs
 	return nil
 }
 
-// UpdateUserLastSeen updates the last seen timestamp for a user
 func (m *MongoClient) UpdateUserLastSeen(ctx context.Context, address string) error {
 	return m.UpdateUser(ctx, address, bson.M{"last_seen": time.Now()})
 }
 
-// GetActiveGames retrieves games that are currently active (not completed)
 func (m *MongoClient) GetActiveGames(ctx context.Context) ([]Game, error) {
 	collection := m.database.Collection("games")
 
@@ -492,11 +456,9 @@ func (m *MongoClient) GetActiveGames(ctx context.Context) ([]Game, error) {
 	return games, nil
 }
 
-// GetGameStats retrieves statistics about games
 func (m *MongoClient) GetGameStats(ctx context.Context) (map[string]interface{}, error) {
 	collection := m.database.Collection("games")
 
-	// Aggregate pipeline to get game statistics
 	pipeline := []bson.M{
 		{
 			"$group": bson.M{
@@ -542,7 +504,6 @@ func (m *MongoClient) GetGameStats(ctx context.Context) (map[string]interface{},
 	return stats, nil
 }
 
-// GetUserStats retrieves statistics for a specific user
 func (m *MongoClient) GetUserStats(ctx context.Context, address string) (map[string]interface{}, error) {
 	collection := m.database.Collection("games")
 
@@ -610,7 +571,6 @@ func (m *MongoClient) GetUserStats(ctx context.Context, address string) (map[str
 	stats["total_wins"] = totalWins
 	stats["total_stake"] = totalStake
 
-	// Calculate win rate
 	if totalGames > 0 {
 		stats["win_rate"] = float64(totalWins) / float64(totalGames)
 	} else {
@@ -620,7 +580,6 @@ func (m *MongoClient) GetUserStats(ctx context.Context, address string) (map[str
 	return stats, nil
 }
 
-// UpdateTransactionStatus updates the status of a transaction
 func (m *MongoClient) UpdateTransactionStatus(ctx context.Context, txDigest string, status string, blockHeight *uint64) error {
 	collection := m.database.Collection("transactions")
 
@@ -650,7 +609,6 @@ func (m *MongoClient) UpdateTransactionStatus(ctx context.Context, txDigest stri
 	return nil
 }
 
-// GetPendingTransactions retrieves transactions with pending status
 func (m *MongoClient) GetPendingTransactions(ctx context.Context) ([]Transaction, error) {
 	collection := m.database.Collection("transactions")
 
@@ -679,9 +637,7 @@ func (m *MongoClient) GetPendingTransactions(ctx context.Context) ([]Transaction
 	return transactions, nil
 }
 
-// Helper method to create database indexes
 func (m *MongoClient) createIndexes(ctx context.Context) error {
-	// Games collection indexes
 	gamesCollection := m.database.Collection("games")
 	gamesIndexes := []mongo.IndexModel{
 		{
@@ -705,7 +661,6 @@ func (m *MongoClient) createIndexes(ctx context.Context) error {
 		return fmt.Errorf("failed to create games indexes: %v", err)
 	}
 
-	// Users collection indexes
 	usersCollection := m.database.Collection("users")
 	usersIndexes := []mongo.IndexModel{
 		{
@@ -726,7 +681,6 @@ func (m *MongoClient) createIndexes(ctx context.Context) error {
 		return fmt.Errorf("failed to create users indexes: %v", err)
 	}
 
-	// Transactions collection indexes
 	txCollection := m.database.Collection("transactions")
 	txIndexes := []mongo.IndexModel{
 		{
@@ -756,7 +710,6 @@ func (m *MongoClient) createIndexes(ctx context.Context) error {
 	return nil
 }
 
-// Helper functions for type conversion
 func getStringFromMap(m map[string]interface{}, key string) string {
 	if val, ok := m[key]; ok {
 		if str, ok := val.(string); ok {
@@ -788,12 +741,10 @@ func getUint64FromMap(m map[string]interface{}, key string) uint64 {
 	return 0
 }
 
-// Health check method
 func (m *MongoClient) HealthCheck(ctx context.Context) error {
 	return m.Ping(ctx)
 }
 
-// GetCollectionStats returns statistics about collections
 func (m *MongoClient) GetCollectionStats(ctx context.Context) (map[string]interface{}, error) {
 	stats := make(map[string]interface{})
 	collections := []string{"games", "users", "transactions"}
@@ -810,7 +761,6 @@ func (m *MongoClient) GetCollectionStats(ctx context.Context) (map[string]interf
 	return stats, nil
 }
 
-// Cleanup old completed games (optional maintenance method)
 func (m *MongoClient) CleanupOldGames(ctx context.Context, olderThanDays int) (int64, error) {
 	collection := m.database.Collection("games")
 	cutoffDate := time.Now().AddDate(0, 0, -olderThanDays)

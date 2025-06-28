@@ -11,7 +11,6 @@ func TestMockMongoClient_GameOperations(t *testing.T) {
 	defer client.Close()
 	ctx := context.Background()
 
-	// Test CreateGame
 	testGame := map[string]interface{}{
 		"requester_address": "addr1",
 		"accepter_address":  "addr2",
@@ -27,7 +26,6 @@ func TestMockMongoClient_GameOperations(t *testing.T) {
 		t.Errorf("Expected game ID, got empty string")
 	}
 
-	// Test GetGame
 	retrievedGame, err := client.GetGame(ctx, gameID)
 	if err != nil {
 		t.Errorf("Expected no error getting game, got %v", err)
@@ -36,7 +34,6 @@ func TestMockMongoClient_GameOperations(t *testing.T) {
 		t.Errorf("Expected game, got nil")
 	}
 
-	// Test UpdateGame
 	updates := map[string]interface{}{
 		"status": "completed",
 	}
@@ -45,7 +42,6 @@ func TestMockMongoClient_GameOperations(t *testing.T) {
 		t.Errorf("Expected no error updating game, got %v", err)
 	}
 
-	// Test GetGamesByStatus
 	games, err := client.GetGamesByStatus(ctx, "completed")
 	if err != nil {
 		t.Errorf("Expected no error getting games by status, got %v", err)
@@ -60,7 +56,6 @@ func TestMockMongoClient_TransactionOperations(t *testing.T) {
 	defer client.Close()
 	ctx := context.Background()
 
-	// Test CreateTransaction
 	testTx := map[string]interface{}{
 		"game_id":      "game123",
 		"type":         "stake",
@@ -77,7 +72,6 @@ func TestMockMongoClient_TransactionOperations(t *testing.T) {
 		t.Errorf("Expected transaction ID, got empty string")
 	}
 
-	// Test GetTransactionsByGameID
 	transactions, err := client.GetTransactionsByGameID(ctx, "game123")
 	if err != nil {
 		t.Errorf("Expected no error getting transactions, got %v", err)
@@ -87,13 +81,11 @@ func TestMockMongoClient_TransactionOperations(t *testing.T) {
 		t.Errorf("Expected at least 1 transaction, got %d", len(transactions))
 	}
 
-	// Test UpdateTransactionStatus
 	err = client.UpdateTransactionStatus(ctx, "tx_digest_123", "confirmed", nil)
 	if err != nil {
 		t.Errorf("Expected no error updating transaction status, got %v", err)
 	}
 
-	// Test GetPendingTransactions
 	pendingTxs, err := client.GetPendingTransactions(ctx)
 	if err != nil {
 		t.Errorf("Expected no error getting pending transactions, got %v", err)
@@ -108,7 +100,6 @@ func TestMockMongoClient_UserOperations(t *testing.T) {
 	defer client.Close()
 	ctx := context.Background()
 
-	// Test CreateUser
 	testUser := map[string]interface{}{
 		"address":  "user_addr_123",
 		"username": "testuser",
@@ -123,7 +114,6 @@ func TestMockMongoClient_UserOperations(t *testing.T) {
 		t.Errorf("Expected user ID, got empty string")
 	}
 
-	// Test GetUser
 	user, err := client.GetUser(ctx, "user_addr_123")
 	if err != nil {
 		t.Errorf("Expected no error getting user, got %v", err)
@@ -132,7 +122,6 @@ func TestMockMongoClient_UserOperations(t *testing.T) {
 		t.Errorf("Expected user, got nil")
 	}
 
-	// Test UpdateUser
 	updates := map[string]interface{}{
 		"balance": 6000,
 	}
@@ -141,7 +130,6 @@ func TestMockMongoClient_UserOperations(t *testing.T) {
 		t.Errorf("Expected no error updating user, got %v", err)
 	}
 
-	// Test UpdateUserLastSeen
 	err = client.UpdateUserLastSeen(ctx, "user_addr_123")
 	if err != nil {
 		t.Errorf("Expected no error updating user last seen, got %v", err)
@@ -153,7 +141,6 @@ func TestMockMongoClient_StatisticsOperations(t *testing.T) {
 	defer client.Close()
 	ctx := context.Background()
 
-	// Create some test data first
 	testGame := map[string]interface{}{
 		"requester_address": "addr1",
 		"accepter_address":  "addr2",
@@ -165,7 +152,6 @@ func TestMockMongoClient_StatisticsOperations(t *testing.T) {
 		t.Errorf("Expected no error creating test game, got %v", err)
 	}
 
-	// Test GetActiveGames
 	activeGames, err := client.GetActiveGames(ctx)
 	if err != nil {
 		t.Errorf("Expected no error getting active games, got %v", err)
@@ -174,7 +160,6 @@ func TestMockMongoClient_StatisticsOperations(t *testing.T) {
 		t.Errorf("Expected at least 1 active game, got %d", len(activeGames))
 	}
 
-	// Test GetGameStats
 	gameStats, err := client.GetGameStats(ctx)
 	if err != nil {
 		t.Errorf("Expected no error getting game stats, got %v", err)
@@ -186,7 +171,6 @@ func TestMockMongoClient_StatisticsOperations(t *testing.T) {
 		t.Errorf("Expected total_games > 0, got %v", totalGames)
 	}
 
-	// Test GetUserStats
 	userStats, err := client.GetUserStats(ctx, "addr1")
 	if err != nil {
 		t.Errorf("Expected no error getting user stats, got %v", err)
@@ -195,7 +179,6 @@ func TestMockMongoClient_StatisticsOperations(t *testing.T) {
 		t.Errorf("Expected user stats, got nil")
 	}
 
-	// Test GetCollectionStats
 	collStats, err := client.GetCollectionStats(ctx)
 	if err != nil {
 		t.Errorf("Expected no error getting collection stats, got %v", err)
@@ -210,13 +193,11 @@ func TestMockMongoClient_UtilityOperations(t *testing.T) {
 	defer client.Close()
 	ctx := context.Background()
 
-	// Test HealthCheck
 	err := client.HealthCheck(ctx)
 	if err != nil {
 		t.Errorf("Expected no error on health check, got %v", err)
 	}
 
-	// Test CleanupOldGames
 	deletedCount, err := client.CleanupOldGames(ctx, 30)
 	if err != nil {
 		t.Errorf("Expected no error on cleanup, got %v", err)
@@ -230,10 +211,8 @@ func TestMockMongoClient_ErrorHandling(t *testing.T) {
 	client := mocks.NewMockMongoClient()
 	ctx := context.Background()
 
-	// Close client first
 	client.Close()
 
-	// Test operations on closed client
 	_, err := client.CreateGame(ctx, map[string]interface{}{})
 	if err == nil {
 		t.Errorf("Expected error on closed client, got nil")
@@ -249,7 +228,6 @@ func TestMockMongoClient_ErrorHandling(t *testing.T) {
 		t.Errorf("Expected error on closed client, got nil")
 	}
 
-	// Test getting non-existent game
 	client2 := mocks.NewMockMongoClient()
 	defer client2.Close()
 
@@ -272,7 +250,6 @@ func TestMockCollection_AdvancedOperations(t *testing.T) {
 	coll := db.Collection("test_collection")
 	ctx := context.Background()
 
-	// Test multiple inserts
 	docs := []interface{}{
 		map[string]interface{}{"name": "doc1", "value": 100},
 		map[string]interface{}{"name": "doc2", "value": 200},
@@ -285,8 +262,6 @@ func TestMockCollection_AdvancedOperations(t *testing.T) {
 			t.Errorf("Expected no error inserting document, got %v", err)
 		}
 	}
-
-	// Test Find with multiple documents
 	cursor, err := coll.Find(ctx, map[string]interface{}{})
 	if err != nil {
 		t.Errorf("Expected no error on find, got %v", err)
@@ -307,7 +282,6 @@ func TestMockCollection_AdvancedOperations(t *testing.T) {
 		t.Errorf("Expected %d documents, got %d", len(docs), docCount)
 	}
 
-	// Test multiple deletes
 	for i := 0; i < len(docs); i++ {
 		result, err := coll.DeleteOne(ctx, map[string]interface{}{})
 		if err != nil {
@@ -318,7 +292,6 @@ func TestMockCollection_AdvancedOperations(t *testing.T) {
 		}
 	}
 
-	// Verify collection is empty
 	cursor2, err := coll.Find(ctx, map[string]interface{}{})
 	if err != nil {
 		t.Errorf("Expected no error on find empty collection, got %v", err)

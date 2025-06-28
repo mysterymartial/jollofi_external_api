@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="12ab46a8-f0ab-4ea0-bd8c-6e5dda149148" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflow/cicd.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflow/cicd.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/K8s/deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/K8s/deployment.yaml" afterDir="false" />
@@ -14,8 +13,23 @@
       <change beforePath="$PROJECT_DIR$/K8s/service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/K8s/service.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/api/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/data/mongo_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/data/mongo_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/data/mongo_wrapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/data/mongo_wrapper.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/data/sui_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/data/sui_client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/interfaces/mongodb_interface.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/interfaces/mongodb_interface.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/interfaces/sui_client_interface.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/interfaces/sui_client_interface.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/middleware/middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/middleware/middleware.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/mocks/game_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/mocks/game_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/mocks/mongo_client_mock.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/mocks/mongo_client_mock.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/mocks/sui_client_mock.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/mocks/sui_client_mock.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/routes/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/routes/routes.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/service/game_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/service/game_service.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/service/game_service_interface.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/service/game_service_interface.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/service/game_service_mock.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/tests/game_service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/tests/game_service_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/tests/mongo_client_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/tests/mongo_client_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/tests/routes_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/tests/routes_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/tests/sui_client_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/tests/sui_client_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,6 +88,7 @@
     "Go Test.TestMockSuiClient_Concurrent in jollfi-gaming-api/internal/tests.executor": "Run",
     "Go Test.TestMockSuiClient_CustomFunctions in jollfi-gaming-api/internal/tests.executor": "Run",
     "Go Test.TestMockSuiClient_EdgeCases in jollfi-gaming-api/internal/tests.executor": "Run",
+    "Go Test.TestMockSuiClient_ErrorHandling in jollfi-gaming-api/internal/tests (1).executor": "Run",
     "Go Test.TestMockSuiClient_ErrorHandling in jollfi-gaming-api/internal/tests.executor": "Run",
     "Go Test.TestMockSuiClient_ExecuteTransactionBlock in jollfi-gaming-api/internal/tests.executor": "Run",
     "Go Test.TestMockSuiClient_ExternalPayWinner in jollfi-gaming-api/internal/tests.executor": "Run",
@@ -97,6 +112,7 @@
     "Go Test.TestSuccessResponseFormat in jollfi-gaming-api/internal/tests.executor": "Run",
     "Go Test.go test jollfi-gaming-api/internal/tests (1).executor": "Run",
     "Go Test.go test jollfi-gaming-api/internal/tests (2).executor": "Run",
+    "Go Test.go test jollfi-gaming-api/internal/tests (3).executor": "Run",
     "Go Test.go test jollfi-gaming-api/internal/tests.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.go.formatter.settings.were.checked": "true",
@@ -118,7 +134,7 @@
       <recent name="C:\Users\DELL\Desktop\jollofi-external-api\cmd\server" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build jollfi-gaming-api/cmd/api">
+  <component name="RunManager" selected="Go Test.TestMockSuiClient_ErrorHandling in jollfi-gaming-api/internal/tests (1)">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <working_directory value="$PROJECT_DIR$" />
       <go_parameters value="-i" />
@@ -135,7 +151,7 @@
       <filePath value="$PROJECT_DIR$/cmd/api/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="TestMockSuiClient_ErrorHandling in jollfi-gaming-api/internal/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestMockSuiClient_ErrorHandling in jollfi-gaming-api/internal/tests (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="jollofi-external-api" />
       <working_directory value="$PROJECT_DIR$/internal/tests" />
       <root_directory value="$PROJECT_DIR$" />
@@ -147,7 +163,7 @@
       <pattern value="^\QTestMockSuiClient_ErrorHandling\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="go test jollfi-gaming-api/internal/tests (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestMockSuiClient_ErrorHandling in jollfi-gaming-api/internal/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="jollofi-external-api" />
       <working_directory value="$PROJECT_DIR$/internal/tests" />
       <root_directory value="$PROJECT_DIR$" />
@@ -156,6 +172,7 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
+      <pattern value="^\QTestMockSuiClient_ErrorHandling\E$" />
       <method v="2" />
     </configuration>
     <configuration name="go test jollfi-gaming-api/internal/tests (2)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -169,7 +186,7 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
-    <configuration name="go test jollfi-gaming-api/internal/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="go test jollfi-gaming-api/internal/tests (3)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="jollofi-external-api" />
       <working_directory value="$PROJECT_DIR$/internal/tests" />
       <root_directory value="$PROJECT_DIR$" />
@@ -182,11 +199,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestMockSuiClient_ErrorHandling in jollfi-gaming-api/internal/tests (1)" />
+        <item itemvalue="Go Test.go test jollfi-gaming-api/internal/tests (3)" />
         <item itemvalue="Go Build.go build jollfi-gaming-api/cmd/api" />
         <item itemvalue="Go Test.go test jollfi-gaming-api/internal/tests (2)" />
         <item itemvalue="Go Test.TestMockSuiClient_ErrorHandling in jollfi-gaming-api/internal/tests" />
-        <item itemvalue="Go Test.go test jollfi-gaming-api/internal/tests (1)" />
-        <item itemvalue="Go Test.go test jollfi-gaming-api/internal/tests" />
       </list>
     </recent_temporary>
   </component>

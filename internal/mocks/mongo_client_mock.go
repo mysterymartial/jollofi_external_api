@@ -9,35 +9,29 @@ import (
 	"jollfi-gaming-api/internal/interfaces"
 )
 
-// Ensure mocks implement the interfaces (compile-time check)
 var _ interfaces.MongoClientInterface = (*MockMongoClient)(nil)
 var _ interfaces.MongoDatabaseInterface = (*MockDatabase)(nil)
 var _ interfaces.MongoCollectionInterface = (*MockCollection)(nil)
 var _ interfaces.MongoCursorInterface = (*MockCursor)(nil)
 
-// MockMongoClient implements a mock for MongoClient
 type MockMongoClient struct {
-	databases map[string]*MockDatabase
-	closed    bool
-	// Store mock data
+	databases    map[string]*MockDatabase
+	closed       bool
 	games        map[string]interface{}
 	transactions map[string]interface{}
 	users        map[string]interface{}
 }
 
-// MockDatabase implements a mock for MongoDB database
 type MockDatabase struct {
 	Name        string
 	collections map[string]*MockCollection
 }
 
-// MockCollection implements a mock for MongoDB collection
 type MockCollection struct {
 	Name      string
 	documents []interface{}
 }
 
-// MockCursor implements a mock cursor for Find operations
 type MockCursor struct {
 	documents []interface{}
 	position  int

@@ -19,7 +19,6 @@ import (
 	"jollfi-gaming-api/internal/service"
 )
 
-// Global variable to track start time
 var startTime = time.Now()
 
 // SetupRoutes configures all application routes
@@ -48,7 +47,6 @@ func SetupRoutes(gameService service.GameServiceInterface, cfg *config.Config) *
 	return r
 }
 
-// setupMiddleware configures all middleware
 func setupMiddleware(r *gin.Engine, cfg *config.Config) {
 	if cfg.EnableLogging {
 		r.Use(middleware.LoggerMiddleware())
@@ -79,7 +77,6 @@ func setupMiddleware(r *gin.Engine, cfg *config.Config) {
 	r.Use(middleware.MetricsMiddleware())
 }
 
-// setupAPIRoutes configures API routes
 func setupAPIRoutes(r *gin.Engine, gameService service.GameServiceInterface, cfg *config.Config) {
 	api := r.Group("/api/v1")
 	{
@@ -98,7 +95,6 @@ func setupAPIRoutes(r *gin.Engine, gameService service.GameServiceInterface, cfg
 	}
 }
 
-// setupUtilityRoutes configures utility and system routes
 func setupUtilityRoutes(r *gin.Engine, cfg *config.Config) {
 	r.GET("/health", middleware.HealthCheckHandler())
 	r.POST("/health", func(c *gin.Context) {
@@ -159,7 +155,6 @@ func setupUtilityRoutes(r *gin.Engine, cfg *config.Config) {
 	})
 }
 
-// setupErrorHandlers configures error handling routes
 func setupErrorHandlers(r *gin.Engine) {
 	r.NoRoute(func(c *gin.Context) {
 		log.Printf("NoRoute triggered for path: %s, method: %s", c.Request.URL.Path, c.Request.Method)
@@ -181,7 +176,6 @@ func setupErrorHandlers(r *gin.Engine) {
 	})
 }
 
-// Handler functions
 type tempStakeRequest struct {
 	RequesterCoinID  string `json:"requester_coin_id"`
 	AccepterCoinID   string `json:"accepter_coin_id"`

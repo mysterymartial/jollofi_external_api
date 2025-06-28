@@ -6,19 +6,18 @@ import (
 	"unsafe"
 )
 
-// GameServiceMock wraps the real service with mock dependencies
 type GameServiceMock struct {
 	*service.GameService
 	MockSuiClient   *MockSuiClient
 	MockMongoClient *MockMongoClient
 }
 
-// NewGameServiceMock creates a new GameService with mocks
+// this is for future changes i will later use this mock
+// instead of using the services directly
 func NewGameServiceMock() *GameServiceMock {
 	mockSui := NewMockSuiClient()
 	mockMongo := NewMockMongoClient()
 
-	// Create real service with mock clients (using unsafe conversion)
 	suiClient := (*data.SuiClient)(unsafe.Pointer(mockSui))
 	mongoClient := (*data.MongoClient)(unsafe.Pointer(mockMongo))
 

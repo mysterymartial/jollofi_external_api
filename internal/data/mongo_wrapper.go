@@ -7,22 +7,18 @@ import (
 	"jollfi-gaming-api/internal/interfaces"
 )
 
-// MongoCursor wraps mongo.Cursor to implement MongoCursorInterface
 type MongoCursor struct {
 	cursor *mongo.Cursor
 }
 
-// MongoCollection wraps mongo.Collection to implement MongoCollectionInterface
 type MongoCollection struct {
 	collection *mongo.Collection
 }
 
-// MongoDatabase wraps mongo.Database to implement MongoDatabaseInterface
 type MongoDatabase struct {
 	database *mongo.Database
 }
 
-// MongoCursor implementations
 func (mc *MongoCursor) Next(ctx context.Context) bool {
 	return mc.cursor.Next(ctx)
 }
@@ -39,7 +35,6 @@ func (mc *MongoCursor) Close(ctx context.Context) error {
 	return mc.cursor.Close(ctx)
 }
 
-// MongoCollection implementations
 func (mc *MongoCollection) InsertOne(ctx context.Context, document interface{}) (*mongo.InsertOneResult, error) {
 	return mc.collection.InsertOne(ctx, document)
 }
@@ -64,7 +59,6 @@ func (mc *MongoCollection) DeleteOne(ctx context.Context, filter interface{}) (*
 	return mc.collection.DeleteOne(ctx, filter)
 }
 
-// MongoDatabase implementations
 func (md *MongoDatabase) Collection(name string) interfaces.MongoCollectionInterface {
 	collection := md.database.Collection(name)
 	return &MongoCollection{collection: collection}

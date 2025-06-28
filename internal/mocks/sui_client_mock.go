@@ -5,34 +5,30 @@ import (
 	"fmt"
 	"jollfi-gaming-api/internal/interfaces"
 	"sync"
-	"time" // Added for timestamp
+	"time"
 )
 
-// Ensure MockSuiClient implements the interface (compile-time check)
 var _ interfaces.SuiClientInterface = (*MockSuiClient)(nil)
 
-// MockSuiClient implements a mock for SuiClient
 type MockSuiClient struct {
 	shouldFail   bool
 	responses    map[string]interface{}
 	balance      uint64
 	coins        []map[string]interface{}
 	transactions map[string]interface{}
-	mu           sync.RWMutex // Mutex for thread-safety
+	mu           sync.RWMutex
 
-	// Function overrides for custom behavior
 	ExternalStakeFunc     func(requesterCoinID, accepterCoinID string, amount uint64, ctx context.Context) (string, error)
 	ExternalPayWinnerFunc func(requesterAddress, accepterAddress string, requesterScore, accepterScore, stakeAmount uint64, ctx context.Context) (string, error)
 	GetBalanceFunc        func(ctx context.Context) (uint64, error)
 	GetCoinsFunc          func(ctx context.Context, coinType string) ([]map[string]interface{}, error)
 }
 
-// NewMockSuiClient creates a new mock Sui client
 func NewMockSuiClient() *MockSuiClient {
 	return &MockSuiClient{
 		shouldFail:   false,
 		responses:    make(map[string]interface{}),
-		balance:      1000000, // Default 1 SUI
+		balance:      1000000,
 		transactions: make(map[string]interface{}),
 		coins: []map[string]interface{}{
 			{
@@ -51,37 +47,31 @@ func NewMockSuiClient() *MockSuiClient {
 	}
 }
 
-// SetShouldFail sets whether the mock should simulate failures
 func (m *MockSuiClient) SetShouldFail(fail bool) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.shouldFail = fail
 }
 
-// SetBalance sets the mock balance
 func (m *MockSuiClient) SetBalance(balance uint64) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.balance = balance
 }
 
-// SetCoins sets the mock coins
 func (m *MockSuiClient) SetCoins(coins []map[string]interface{}) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.coins = coins
 }
 
-// AddTransaction adds a mock transaction
 func (m *MockSuiClient) AddTransaction(digest string, tx interface{}) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.transactions[digest] = tx
 }
 
-// ExternalStake mocks the external stake method
 func (m *MockSuiClient) ExternalStake(requesterCoinID, accepterCoinID string, amount uint64, ctx context.Context) (string, error) {
-	// Check for context cancellation or timeout
 	if err := ctx.Err(); err != nil {
 		return "", fmt.Errorf("mock external stake: %w", err)
 	}
@@ -92,12 +82,10 @@ func (m *MockSuiClient) ExternalStake(requesterCoinID, accepterCoinID string, am
 		return "", fmt.Errorf("mock external stake failed")
 	}
 
-	// Use custom function if provided
 	if m.ExternalStakeFunc != nil {
 		return m.ExternalStakeFunc(requesterCoinID, accepterCoinID, amount, ctx)
 	}
 
-	// Validate inputs
 	if requesterCoinID == "" || accepterCoinID == "" {
 		return "", fmt.Errorf("both coin IDs are required")
 	}
@@ -105,10 +93,8 @@ func (m *MockSuiClient) ExternalStake(requesterCoinID, accepterCoinID string, am
 		return "", fmt.Errorf("stake amount must be greater than 0")
 	}
 
-	// Generate mock transaction digest
 	digest := fmt.Sprintf("mock_stake_tx_%s_%s_%d", requesterCoinID, accepterCoinID, amount)
 
-	// Store transaction
 	m.AddTransaction(digest, map[string]interface{}{
 		"type":            "external_stake",
 		"requesterCoinID": requesterCoinID,
@@ -121,9 +107,7 @@ func (m *MockSuiClient) ExternalStake(requesterCoinID, accepterCoinID string, am
 	return digest, nil
 }
 
-// ExternalPayWinner mocks the external pay winner method
 func (m *MockSuiClient) ExternalPayWinner(requesterAddress, accepterAddress string, requesterScore, accepterScore, stakeAmount uint64, ctx context.Context) (string, error) {
-	// Check for context cancellation or timeout
 	if err := ctx.Err(); err != nil {
 		return "", fmt.Errorf("mock external pay winner: %w", err)
 	}
@@ -134,12 +118,10 @@ func (m *MockSuiClient) ExternalPayWinner(requesterAddress, accepterAddress stri
 		return "", fmt.Errorf("mock external pay winner failed")
 	}
 
-	// Use custom function if provided
 	if m.ExternalPayWinnerFunc != nil {
 		return m.ExternalPayWinnerFunc(requesterAddress, accepterAddress, requesterScore, accepterScore, stakeAmount, ctx)
 	}
 
-	// Validate inputs
 	if requesterAddress == "" || accepterAddress == "" {
 		return "", fmt.Errorf("both addresses are required")
 	}
@@ -147,7 +129,6 @@ func (m *MockSuiClient) ExternalPayWinner(requesterAddress, accepterAddress stri
 		return "", fmt.Errorf("stake amount must be greater than 0")
 	}
 
-	// Determine winner
 	var winner string
 	if requesterScore > accepterScore {
 		winner = requesterAddress
@@ -157,16 +138,13 @@ func (m *MockSuiClient) ExternalPayWinner(requesterAddress, accepterAddress stri
 		winner = "tie"
 	}
 
-	// Calculate prize (simplified)
 	totalStake := stakeAmount * 2
-	apiFee := totalStake * 8 / 100    // 8% API fee
-	escrowFee := totalStake * 2 / 100 // 2% escrow fee
+	apiFee := totalStake * 8 / 100
+	escrowFee := totalStake * 2 / 100
 	prizeAmount := totalStake - apiFee - escrowFee
 
-	// Generate mock transaction digest
 	digest := fmt.Sprintf("mock_pay_winner_tx_%s_%s_%d", requesterAddress, accepterAddress, stakeAmount)
 
-	// Store transaction
 	m.AddTransaction(digest, map[string]interface{}{
 		"type":             "external_pay_winner",
 		"requesterAddress": requesterAddress,
@@ -180,15 +158,13 @@ func (m *MockSuiClient) ExternalPayWinner(requesterAddress, accepterAddress stri
 		"apiFee":           apiFee,
 		"escrowFee":        escrowFee,
 		"status":           "success",
-		"timestamp":        time.Now().Unix(), // Added timestamp
+		"timestamp":        time.Now().Unix(),
 	})
 
 	return digest, nil
 }
 
-// ExecuteTransactionBlock mocks executing a transaction block
 func (m *MockSuiClient) ExecuteTransactionBlock(ctx context.Context, txBytes []byte) (string, error) {
-	// Check for context cancellation or timeout
 	if err := ctx.Err(); err != nil {
 		return "", fmt.Errorf("mock execute transaction block: %w", err)
 	}
@@ -203,10 +179,8 @@ func (m *MockSuiClient) ExecuteTransactionBlock(ctx context.Context, txBytes []b
 		return "", fmt.Errorf("transaction bytes cannot be empty")
 	}
 
-	// Generate mock digest based on tx bytes
 	digest := fmt.Sprintf("mock_execute_tx_%x", len(txBytes))
 
-	// Store transaction
 	m.AddTransaction(digest, map[string]interface{}{
 		"type":    "execute_transaction_block",
 		"txBytes": txBytes,
@@ -216,9 +190,7 @@ func (m *MockSuiClient) ExecuteTransactionBlock(ctx context.Context, txBytes []b
 	return digest, nil
 }
 
-// GetTransactionBlock mocks getting a transaction block
 func (m *MockSuiClient) GetTransactionBlock(ctx context.Context, digest string) (interface{}, error) {
-	// Check for context cancellation or timeout
 	if err := ctx.Err(); err != nil {
 		return nil, fmt.Errorf("mock get transaction block: %w", err)
 	}
@@ -233,14 +205,12 @@ func (m *MockSuiClient) GetTransactionBlock(ctx context.Context, digest string) 
 		return nil, fmt.Errorf("transaction digest is required")
 	}
 
-	// Check if transaction exists in mock storage
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	if tx, exists := m.transactions[digest]; exists {
 		return tx, nil
 	}
 
-	// Return default mock transaction
 	return map[string]interface{}{
 		"digest": digest,
 		"status": "success",
@@ -253,9 +223,7 @@ func (m *MockSuiClient) GetTransactionBlock(ctx context.Context, digest string) 
 	}, nil
 }
 
-// BuildTransactionBlock mocks building a transaction block
 func (m *MockSuiClient) BuildTransactionBlock(ctx context.Context, params interface{}) ([]byte, error) {
-	// Check for context cancellation or timeout
 	if err := ctx.Err(); err != nil {
 		return nil, fmt.Errorf("mock build transaction block: %w", err)
 	}
@@ -270,26 +238,21 @@ func (m *MockSuiClient) BuildTransactionBlock(ctx context.Context, params interf
 		return nil, fmt.Errorf("transaction parameters are required")
 	}
 
-	// Generate mock transaction bytes based on params
 	mockBytes := []byte(fmt.Sprintf("mock_tx_bytes_%v", params))
 
 	return mockBytes, nil
 }
 
-// GetBalance mocks getting balance
 func (m *MockSuiClient) GetBalance(ctx context.Context) (uint64, error) {
-	// Check for context cancellation or timeout
 	if err := ctx.Err(); err != nil {
 		return 0, fmt.Errorf("mock get balance: %w", err)
 	}
-
 	if m.shouldFail {
 		m.mu.RLock()
 		defer m.mu.RUnlock()
 		return 0, fmt.Errorf("mock get balance failed")
 	}
 
-	// Use custom function if provided
 	if m.GetBalanceFunc != nil {
 		return m.GetBalanceFunc(ctx)
 	}
@@ -299,9 +262,7 @@ func (m *MockSuiClient) GetBalance(ctx context.Context) (uint64, error) {
 	return m.balance, nil
 }
 
-// GetCoins mocks getting coins
 func (m *MockSuiClient) GetCoins(ctx context.Context, coinType string) ([]map[string]interface{}, error) {
-	// Check for context cancellation or timeout
 	if err := ctx.Err(); err != nil {
 		return nil, fmt.Errorf("mock get coins: %w", err)
 	}
@@ -312,7 +273,6 @@ func (m *MockSuiClient) GetCoins(ctx context.Context, coinType string) ([]map[st
 		return nil, fmt.Errorf("mock get coins failed")
 	}
 
-	// Use custom function if provided
 	if m.GetCoinsFunc != nil {
 		return m.GetCoinsFunc(ctx, coinType)
 	}
@@ -326,9 +286,6 @@ func (m *MockSuiClient) GetCoins(ctx context.Context, coinType string) ([]map[st
 	return m.coins, nil
 }
 
-// Additional helper methods for testing
-
-// GetMockTransaction retrieves a stored mock transaction
 func (m *MockSuiClient) GetMockTransaction(digest string) (interface{}, bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -336,28 +293,24 @@ func (m *MockSuiClient) GetMockTransaction(digest string) (interface{}, bool) {
 	return tx, exists
 }
 
-// ClearTransactions clears all stored mock transactions
 func (m *MockSuiClient) ClearTransactions() {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.transactions = make(map[string]interface{})
 }
 
-// GetTransactionCount returns the number of stored mock transactions
 func (m *MockSuiClient) GetTransactionCount() int {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	return len(m.transactions)
 }
 
-// SetCustomResponse sets a custom response for testing
 func (m *MockSuiClient) SetCustomResponse(key string, value interface{}) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.responses[key] = value
 }
 
-// GetCustomResponse gets a custom response for testing
 func (m *MockSuiClient) GetCustomResponse(key string) (interface{}, bool) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()

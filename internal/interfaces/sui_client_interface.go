@@ -2,7 +2,6 @@ package interfaces
 
 import "context"
 
-// SuiClientInterface defines the interfaces for SUI blockchain client
 type SuiClientInterface interface {
 	ExternalStake(requesterCoinID, accepterCoinID string, amount uint64, ctx context.Context) (string, error)
 	ExternalPayWinner(requesterAddress, accepterAddress string, requesterScore, accepterScore, stakeAmount uint64, ctx context.Context) (string, error)

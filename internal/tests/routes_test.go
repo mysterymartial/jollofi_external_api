@@ -15,7 +15,6 @@ import (
 	"testing"
 )
 
-// Helper function to create test router
 func createTestRouter() (*gin.Engine, service.GameServiceInterface) {
 	gin.SetMode(gin.TestMode)
 
@@ -40,7 +39,6 @@ func createTestRouter() (*gin.Engine, service.GameServiceInterface) {
 	return router, gameService
 }
 
-// Test root endpoint
 func TestRootEndpoint(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -73,7 +71,6 @@ func TestRootEndpoint(t *testing.T) {
 	}
 }
 
-// Test health check endpoint
 func TestHealthCheckEndpoint(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -102,7 +99,6 @@ func TestHealthCheckEndpoint(t *testing.T) {
 	}
 }
 
-// Test API info endpoint
 func TestAPIInfoEndpoint(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -148,7 +144,6 @@ func TestAPIInfoEndpoint(t *testing.T) {
 	}
 }
 
-// Test status endpoint
 func TestStatusEndpoint(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -189,7 +184,6 @@ func TestStatusEndpoint(t *testing.T) {
 	}
 }
 
-// Test stake game route - success
 func TestStakeGameRoute_Success(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -214,7 +208,6 @@ func TestStakeGameRoute_Success(t *testing.T) {
 	}
 }
 
-// Test stake game route - invalid JSON
 func TestStakeGameRoute_InvalidJSON(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -244,7 +237,6 @@ func TestStakeGameRoute_InvalidJSON(t *testing.T) {
 	}
 }
 
-// Test stake game route - validation errors
 func TestStakeGameRoute_ValidationErrors(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -336,7 +328,6 @@ func TestStakeGameRoute_ValidationErrors(t *testing.T) {
 	}
 }
 
-// Test pay winner route - success
 func TestPayWinnerRoute_Success(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -359,7 +350,6 @@ func TestPayWinnerRoute_Success(t *testing.T) {
 	}
 }
 
-// Test pay winner route - validation errors
 func TestPayWinnerRoute_ValidationErrors(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -431,7 +421,6 @@ func TestPayWinnerRoute_ValidationErrors(t *testing.T) {
 	}
 }
 
-// Test get stake history route - success
 func TestGetStakeHistoryRoute_Success(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -447,7 +436,6 @@ func TestGetStakeHistoryRoute_Success(t *testing.T) {
 	}
 }
 
-// Test get stake history route - invalid address
 func TestGetStakeHistoryRoute_InvalidAddress(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -498,7 +486,6 @@ func TestGetStakeHistoryRoute_InvalidAddress(t *testing.T) {
 	}
 }
 
-// Test get game history route - success
 func TestGetGameHistoryRoute_Success(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -540,7 +527,6 @@ func TestGetGameHistoryRoute_InvalidAddress(t *testing.T) {
 	}
 }
 
-// Test get game stats route
 func TestGetGameStatsRoute(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -576,7 +562,6 @@ func TestGetGameStatsRoute(t *testing.T) {
 	}
 }
 
-// Test 404 error handler
 func TestNotFoundHandler(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -613,18 +598,14 @@ func TestNotFoundHandler(t *testing.T) {
 	}
 }
 
-// Test 405 method not allowed handler
 func TestMethodNotAllowedHandler(t *testing.T) {
 	router, _ := createTestRouter()
 
-	// Try to POST to a GET-only endpoint
 	req, _ := http.NewRequest("POST", "/health", nil)
 	req.Header.Set("Origin", "http://localhost")
 	w := httptest.NewRecorder()
 
 	router.ServeHTTP(w, req)
-
-	// Log response details for debugging
 	t.Logf("Response Status: %d", w.Code)
 	t.Logf("Response Headers: %v", w.Header())
 	t.Logf("Response Body: %s", w.Body.String())
@@ -649,7 +630,6 @@ func TestMethodNotAllowedHandler(t *testing.T) {
 	}
 }
 
-// Test middleware integration
 func TestMiddlewareIntegration(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -658,7 +638,6 @@ func TestMiddlewareIntegration(t *testing.T) {
 
 	router.ServeHTTP(w, req)
 
-	// Check that middleware headers are set
 	if w.Header().Get("X-Request-ID") == "" {
 		t.Error("Expected X-Request-ID header from RequestIDMiddleware")
 	}
@@ -672,7 +651,6 @@ func TestMiddlewareIntegration(t *testing.T) {
 	}
 }
 
-// Test address validation function
 func TestSuiAddressValidation(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -747,7 +725,6 @@ func TestSuiAddressValidation(t *testing.T) {
 	}
 }
 
-// Test JSON parsing edge cases
 func TestJSONParsingEdgeCases(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -781,7 +758,6 @@ func TestJSONParsingEdgeCases(t *testing.T) {
 
 			router.ServeHTTP(w, req)
 
-			// Should return 400 for invalid/incomplete data
 			if w.Code != http.StatusBadRequest {
 				t.Errorf("Expected status 400 for case '%s', got %d", tc.name, w.Code)
 				t.Logf("Response body: %s", w.Body.String())
@@ -790,7 +766,6 @@ func TestJSONParsingEdgeCases(t *testing.T) {
 	}
 }
 
-// Test content type validation
 func TestContentTypeValidation(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -850,11 +825,8 @@ func TestContentTypeValidation(t *testing.T) {
 	}
 }
 
-// Test large request bodies
 func TestLargeRequestBody(t *testing.T) {
 	router, _ := createTestRouter()
-
-	// Create a request with very long strings
 	stakeReq := request.StakeRequest{
 		RequesterCoinID:  strings.Repeat("0x", 1000) + "123",
 		AccepterCoinID:   strings.Repeat("0x", 1000) + "456",
@@ -870,13 +842,11 @@ func TestLargeRequestBody(t *testing.T) {
 
 	router.ServeHTTP(w, req)
 
-	// Should handle large requests gracefully (either accept or reject with proper error)
 	if w.Code != http.StatusOK && w.Code != http.StatusBadRequest && w.Code != http.StatusRequestEntityTooLarge {
 		t.Errorf("Expected status 200, 400, or 413 for large request, got %d", w.Code)
 	}
 }
 
-// Test concurrent requests
 func TestConcurrentRequests(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -893,7 +863,6 @@ func TestConcurrentRequests(t *testing.T) {
 
 	jsonData, _ := json.Marshal(stakeReq)
 
-	// Launch concurrent requests
 	for i := 0; i < numRequests; i++ {
 		go func() {
 			req, _ := http.NewRequest("POST", "/api/v1/games/stake", bytes.NewBuffer(jsonData))
@@ -905,7 +874,6 @@ func TestConcurrentRequests(t *testing.T) {
 		}()
 	}
 
-	// Collect results
 	successCount := 0
 	for i := 0; i < numRequests; i++ {
 		code := <-results
@@ -919,7 +887,6 @@ func TestConcurrentRequests(t *testing.T) {
 	}
 }
 
-// Test route parameter edge cases
 func TestRouteParameterEdgeCases(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -961,7 +928,6 @@ func TestRouteParameterEdgeCases(t *testing.T) {
 	}
 }
 
-// Test HTTP methods on all endpoints
 func TestHTTPMethods(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -1038,7 +1004,6 @@ func TestHTTPMethods(t *testing.T) {
 					}
 				} else {
 					if method != "OPTIONS" && w.Code != http.StatusMethodNotAllowed && w.Code != http.StatusNotFound {
-						// Some methods might return 404 instead of 405, which is also acceptable
 						t.Logf("Method %s on %s returned %d (expected 405 or 404)", method, endpoint.path, w.Code)
 					}
 				}

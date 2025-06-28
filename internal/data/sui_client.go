@@ -74,10 +74,8 @@ func NewSuiClient(rpcURL string, privateKeyStr string, cfg *Config) (*SuiClient,
 	var privateKeyBytes []byte
 	var err error
 
-	// Try decoding as hex
 	privateKeyBytes, err = hex.DecodeString(privateKeyStr)
 	if err != nil {
-		// Try decoding as base64 (Sui CLI format with flag byte)
 		privateKeyBytes, err = base64.StdEncoding.DecodeString(privateKeyStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode private key: %v", err)
@@ -97,16 +95,14 @@ func NewSuiClient(rpcURL string, privateKeyStr string, cfg *Config) (*SuiClient,
 		}
 	}
 
-	// Verify key length
 	if len(privateKeyBytes) != 32 {
 		return nil, fmt.Errorf("private key must be 32 bytes, got %d", len(privateKeyBytes))
 	}
 
-	// Generate key pair
 	privateKey := ed25519.NewKeyFromSeed(privateKeyBytes)
 	publicKey := privateKey.Public().(ed25519.PublicKey)
 
-	// Generate Sui address (simplified - adjust if needed for proper derivation)
+	// Generate Sui address
 	address := fmt.Sprintf("0x%x", publicKey[:20])
 
 	return &SuiClient{
@@ -161,15 +157,12 @@ func (s *SuiClient) makeRPCCall(ctx context.Context, method string, params []int
 	return &rpcResp, nil
 }
 
-// Interface method implementations
-
-// GetCoins implements interfaces.SuiClientInterface
 func (s *SuiClient) GetCoins(ctx context.Context, coinType string) ([]map[string]interface{}, error) {
 	params := []interface{}{
 		s.address,
 		coinType,
-		nil, // cursor
-		10,  // limit
+		nil,
+		10,
 	}
 
 	resp, err := s.makeRPCCall(ctx, "suix_getCoins", params)
@@ -187,7 +180,6 @@ func (s *SuiClient) GetCoins(ctx context.Context, coinType string) ([]map[string
 	return result.Data, nil
 }
 
-// GetBalance implements interfaces.SuiClientInterface
 func (s *SuiClient) GetBalance(ctx context.Context) (uint64, error) {
 	params := []interface{}{
 		s.address,
@@ -206,7 +198,6 @@ func (s *SuiClient) GetBalance(ctx context.Context) (uint64, error) {
 		return 0, fmt.Errorf("failed to parse balance response: %v", err)
 	}
 
-	// Convert string balance to uint64
 	balance, err := strconv.ParseUint(result.TotalBalance, 10, 64)
 	if err != nil {
 		return 0, fmt.Errorf("failed to parse balance amount: %v", err)
@@ -215,9 +206,7 @@ func (s *SuiClient) GetBalance(ctx context.Context) (uint64, error) {
 	return balance, nil
 }
 
-// ExternalStake implements interfaces.SuiClientInterface
 func (s *SuiClient) ExternalStake(requesterCoinID, accepterCoinID string, amount uint64, ctx context.Context) (string, error) {
-	// Basic validation only
 	if requesterCoinID == "" || accepterCoinID == "" {
 		return "", fmt.Errorf("both coin IDs are required")
 	}
@@ -225,7 +214,6 @@ func (s *SuiClient) ExternalStake(requesterCoinID, accepterCoinID string, amount
 		return "", fmt.Errorf("stake amount must be greater than 0")
 	}
 
-	// Get gas coin (different from the two payment coins)
 	coins, err := s.GetCoins(ctx, "0x2::sui::SUI")
 	if err != nil {
 		return "", fmt.Errorf("failed to get coins for gas: %v", err)
@@ -245,6 +233,7 @@ func (s *SuiClient) ExternalStake(requesterCoinID, accepterCoinID string, amount
 	}
 
 	// Build move call - matches blockchain function exactly
+	//this call speaks to blockchain
 	moveCallReq := MoveCallRequest{
 		Signer:          s.address,
 		PackageObjectId: s.config.PackageID,
@@ -252,10 +241,10 @@ func (s *SuiClient) ExternalStake(requesterCoinID, accepterCoinID string, amount
 		Function:        "external_stake",
 		TypeArguments:   []string{"0x2::sui::SUI"},
 		Arguments: []interface{}{
-			s.config.PoolID,           // pool: &mut StakePool
-			requesterCoinID,           // requester_payment: Coin<SUI>
-			accepterCoinID,            // accepter_payment: Coin<SUI>
-			fmt.Sprintf("%d", amount), // amount: u64
+			s.config.PoolID,
+			requesterCoinID,
+			accepterCoinID,
+			fmt.Sprintf("%d", amount),
 		},
 		Gas:       gasCoin,
 		GasBudget: "10000000",
@@ -264,9 +253,7 @@ func (s *SuiClient) ExternalStake(requesterCoinID, accepterCoinID string, amount
 	return s.executeTransaction(ctx, moveCallReq, "ExternalGameStaked")
 }
 
-// ExternalPayWinner implements interfaces.SuiClientInterface
 func (s *SuiClient) ExternalPayWinner(requesterAddress, accepterAddress string, requesterScore, accepterScore, stakeAmount uint64, ctx context.Context) (string, error) {
-	// Get gas coins
 	coins, err := s.GetCoins(ctx, "0x2::sui::SUI")
 	if err != nil {
 		return "", fmt.Errorf("failed to get coins: %v", err)
@@ -274,8 +261,6 @@ func (s *SuiClient) ExternalPayWinner(requesterAddress, accepterAddress string, 
 	if len(coins) == 0 {
 		return "", fmt.Errorf("no SUI coins available for gas")
 	}
-
-	// Build move call with correct parameters
 	moveCallReq := MoveCallRequest{
 		Signer:          s.address,
 		PackageObjectId: s.config.PackageID,
@@ -283,18 +268,17 @@ func (s *SuiClient) ExternalPayWinner(requesterAddress, accepterAddress string, 
 		Function:        "external_pay_winner",
 		TypeArguments:   []string{},
 		Arguments: []interface{}{
-			s.config.PoolID,                   // pool: &mut StakePool
-			requesterAddress,                  // requester_address: address
-			accepterAddress,                   // accepter_address: address
-			fmt.Sprintf("%d", requesterScore), // requester_score: u64
-			fmt.Sprintf("%d", accepterScore),  // accepter_score: u64
-			fmt.Sprintf("%d", stakeAmount),    // stake_amount: u64
+			s.config.PoolID,
+			requesterAddress,
+			accepterAddress,
+			fmt.Sprintf("%d", requesterScore),
+			fmt.Sprintf("%d", accepterScore),
+			fmt.Sprintf("%d", stakeAmount),
 		},
 		Gas:       coins[0]["coinObjectId"].(string),
 		GasBudget: "10000000", // 0.01 SUI
 	}
 
-	// Build transaction block
 	params := []interface{}{moveCallReq}
 	resp, err := s.makeRPCCall(ctx, "unsafe_moveCall", params)
 	if err != nil {
@@ -308,13 +292,11 @@ func (s *SuiClient) ExternalPayWinner(requesterAddress, accepterAddress string, 
 		return "", fmt.Errorf("failed to parse transaction bytes: %v", err)
 	}
 
-	// Sign transaction
 	signature, err := s.signTransaction(txBytes.TxBytes)
 	if err != nil {
 		return "", fmt.Errorf("failed to sign transaction: %v", err)
 	}
 
-	// Execute transaction
 	execParams := []interface{}{
 		txBytes.TxBytes,
 		[]string{signature},
@@ -334,7 +316,6 @@ func (s *SuiClient) ExternalPayWinner(requesterAddress, accepterAddress string, 
 		return "", fmt.Errorf("failed to parse execution result: %v", err)
 	}
 
-	// Process events - Updated to match blockchain event structure
 	eventType := fmt.Sprintf("%s::%s::ExternalGameCompleted", s.config.PackageID, s.config.ModuleName)
 	for _, event := range txResult.Events {
 		if event.Type == eventType {
@@ -361,18 +342,14 @@ func (s *SuiClient) ExternalPayWinner(requesterAddress, accepterAddress string, 
 	return txResult.Digest, nil
 }
 
-// ExecuteTransactionBlock implements interfaces.SuiClientInterface
 func (s *SuiClient) ExecuteTransactionBlock(ctx context.Context, txBytes []byte) (string, error) {
-	// Convert bytes to base64 string (Sui expects base64 encoded transaction bytes)
 	txBytesStr := base64.StdEncoding.EncodeToString(txBytes)
 
-	// Sign transaction
 	signature, err := s.signTransaction(txBytesStr)
 	if err != nil {
 		return "", fmt.Errorf("failed to sign transaction: %v", err)
 	}
 
-	// Execute transaction
 	execParams := []interface{}{
 		txBytesStr,
 		[]string{signature},
@@ -395,7 +372,6 @@ func (s *SuiClient) ExecuteTransactionBlock(ctx context.Context, txBytes []byte)
 	return txResult.Digest, nil
 }
 
-// GetTransactionBlock implements interfaces.SuiClientInterface
 func (s *SuiClient) GetTransactionBlock(ctx context.Context, digest string) (interface{}, error) {
 	if digest == "" {
 		return nil, fmt.Errorf("transaction digest is required")
@@ -425,21 +401,17 @@ func (s *SuiClient) GetTransactionBlock(ctx context.Context, digest string) (int
 	return result, nil
 }
 
-// BuildTransactionBlock implements interfaces.SuiClientInterface
 func (s *SuiClient) BuildTransactionBlock(ctx context.Context, params interface{}) ([]byte, error) {
 	if params == nil {
 		return nil, fmt.Errorf("transaction parameters are required")
 	}
 
-	// Handle different parameter types
 	var rpcParams []interface{}
 
 	switch p := params.(type) {
 	case MoveCallRequest:
-		// If it's a MoveCallRequest, use it directly
 		rpcParams = []interface{}{p}
 	case map[string]interface{}:
-		// If it's a generic map, try to convert to MoveCallRequest
 		moveCall := MoveCallRequest{
 			Signer:          s.address,
 			PackageObjectId: s.config.PackageID,
@@ -461,12 +433,11 @@ func (s *SuiClient) BuildTransactionBlock(ctx context.Context, params interface{
 		if budget, ok := p["gasBudget"].(string); ok {
 			moveCall.GasBudget = budget
 		} else {
-			moveCall.GasBudget = "10000000" // Default gas budget
+			moveCall.GasBudget = "10000000"
 		}
 
 		rpcParams = []interface{}{moveCall}
 	default:
-		// For other types, pass as-is
 		rpcParams = []interface{}{params}
 	}
 
@@ -482,7 +453,6 @@ func (s *SuiClient) BuildTransactionBlock(ctx context.Context, params interface{
 		return nil, fmt.Errorf("failed to parse transaction bytes: %v", err)
 	}
 
-	// Decode base64 to bytes
 	decodedBytes, err := base64.StdEncoding.DecodeString(txBytes.TxBytes)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode transaction bytes: %v", err)
@@ -491,16 +461,12 @@ func (s *SuiClient) BuildTransactionBlock(ctx context.Context, params interface{
 	return decodedBytes, nil
 }
 
-// Helper methods
-
 func (s *SuiClient) signTransaction(txBytes string) (string, error) {
-	// Decode transaction bytes
 	txBytesDecoded, err := base64.StdEncoding.DecodeString(txBytes)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode transaction bytes: %v", err)
 	}
 
-	// Sign with Ed25519
 	signature := ed25519.Sign(s.privateKey, txBytesDecoded)
 
 	// Encode signature (Sui format: flag + signature + public key)
@@ -512,14 +478,13 @@ func (s *SuiClient) signTransaction(txBytes string) (string, error) {
 	return base64.StdEncoding.EncodeToString(suiSignature), nil
 }
 
-// Helper method to split coins for exact amounts
 func (s *SuiClient) splitCoin(ctx context.Context, coinId string, amount uint64) (string, error) {
 	params := []interface{}{
 		s.address,
 		coinId,
 		[]string{fmt.Sprintf("%d", amount)},
-		nil,        // gas
-		"10000000", // gas budget
+		nil,
+		"10000000",
 	}
 
 	resp, err := s.makeRPCCall(ctx, "unsafe_splitCoin", params)
@@ -534,7 +499,6 @@ func (s *SuiClient) splitCoin(ctx context.Context, coinId string, amount uint64)
 		return "", fmt.Errorf("failed to parse split coin response: %v", err)
 	}
 
-	// Sign and execute the split transaction
 	signature, err := s.signTransaction(txBytes.TxBytes)
 	if err != nil {
 		return "", fmt.Errorf("failed to sign split transaction: %v", err)
@@ -559,11 +523,9 @@ func (s *SuiClient) splitCoin(ctx context.Context, coinId string, amount uint64)
 		return "", fmt.Errorf("failed to parse split execution result: %v", err)
 	}
 
-	// Extract the new coin ID from effects (this is simplified - you'd need to parse the actual effects)
-	return "new_coin_id", nil // You'll need to extract this from the transaction effects
+	return "new_coin_id", nil
 }
 
-// Enhanced coin management methods
 func (s *SuiClient) GetSufficientCoins(ctx context.Context, requiredAmount uint64, count int) ([]string, error) {
 	coins, err := s.GetCoins(ctx, "0x2::sui::SUI")
 	if err != nil {
@@ -592,9 +554,7 @@ func (s *SuiClient) GetSufficientCoins(ctx context.Context, requiredAmount uint6
 	return suitableCoins, nil
 }
 
-// Method to merge coins if needed
 func (s *SuiClient) MergeCoins(ctx context.Context, primaryCoin string, coinToMerge string) (string, error) {
-	// Get gas coin
 	coins, err := s.GetCoins(ctx, "0x2::sui::SUI")
 	if err != nil {
 		return "", fmt.Errorf("failed to get coins for gas: %v", err)
@@ -618,9 +578,8 @@ func (s *SuiClient) MergeCoins(ctx context.Context, primaryCoin string, coinToMe
 		primaryCoin,
 		coinToMerge,
 		gasCoin,
-		"10000000", // gas budget
+		"10000000",
 	}
-
 	resp, err := s.makeRPCCall(ctx, "unsafe_mergeCoins", params)
 	if err != nil {
 		return "", fmt.Errorf("failed to merge coins: %v", err)
@@ -633,7 +592,6 @@ func (s *SuiClient) MergeCoins(ctx context.Context, primaryCoin string, coinToMe
 		return "", fmt.Errorf("failed to parse merge response: %v", err)
 	}
 
-	// Sign and execute
 	signature, err := s.signTransaction(txBytes.TxBytes)
 	if err != nil {
 		return "", fmt.Errorf("failed to sign merge transaction: %v", err)
@@ -661,9 +619,7 @@ func (s *SuiClient) MergeCoins(ctx context.Context, primaryCoin string, coinToMe
 	return txResult.Digest, nil
 }
 
-// Enhanced ExternalStake with better coin management
 func (s *SuiClient) ExternalStakeEnhanced(requesterAddress, accepterAddress string, amount uint64, ctx context.Context) (string, error) {
-	// Validate addresses
 	if requesterAddress == "" || accepterAddress == "" {
 		return "", fmt.Errorf("requester and accepter addresses are required")
 	}
@@ -671,13 +627,11 @@ func (s *SuiClient) ExternalStakeEnhanced(requesterAddress, accepterAddress stri
 		return "", fmt.Errorf("stake amount must be greater than 0")
 	}
 
-	// Get sufficient coins (2 for payments + 1 for gas)
 	coins, err := s.GetSufficientCoins(ctx, amount, 2)
 	if err != nil {
 		return "", fmt.Errorf("failed to get sufficient coins for staking: %v", err)
 	}
 
-	// Get additional coin for gas
 	allCoins, err := s.GetCoins(ctx, "0x2::sui::SUI")
 	if err != nil {
 		return "", fmt.Errorf("failed to get coins for gas: %v", err)
@@ -696,7 +650,6 @@ func (s *SuiClient) ExternalStakeEnhanced(requesterAddress, accepterAddress stri
 		return "", fmt.Errorf("no gas coin available")
 	}
 
-	// Build move call with exact parameters matching blockchain function
 	moveCallReq := MoveCallRequest{
 		Signer:          s.address,
 		PackageObjectId: s.config.PackageID,
@@ -704,21 +657,20 @@ func (s *SuiClient) ExternalStakeEnhanced(requesterAddress, accepterAddress stri
 		Function:        "external_stake",
 		TypeArguments:   []string{"0x2::sui::SUI"},
 		Arguments: []interface{}{
-			s.config.PoolID,           // pool: &mut StakePool
-			coins[0],                  // requester_payment: Coin<SUI>
-			coins[1],                  // accepter_payment: Coin<SUI>
-			fmt.Sprintf("%d", amount), // amount: u64
+			s.config.PoolID,
+			coins[0],
+			coins[1],
+			fmt.Sprintf("%d", amount),
 		},
-		Gas:       gasCoin,
-		GasBudget: "20000000", // Increased gas budget for complex transaction
+		Gas: gasCoin,
+		// gas budget increased because of complexity of the transaction
+		GasBudget: "20000000",
 	}
 
 	return s.executeTransaction(ctx, moveCallReq, "ExternalGameStaked")
 }
 
-// Helper method to execute transactions and handle common logic
 func (s *SuiClient) executeTransaction(ctx context.Context, moveCallReq MoveCallRequest, expectedEventSuffix string) (string, error) {
-	// Build transaction block
 	params := []interface{}{moveCallReq}
 	resp, err := s.makeRPCCall(ctx, "unsafe_moveCall", params)
 	if err != nil {
@@ -732,13 +684,11 @@ func (s *SuiClient) executeTransaction(ctx context.Context, moveCallReq MoveCall
 		return "", fmt.Errorf("failed to parse transaction bytes: %v", err)
 	}
 
-	// Sign transaction
 	signature, err := s.signTransaction(txBytes.TxBytes)
 	if err != nil {
 		return "", fmt.Errorf("failed to sign transaction: %v", err)
 	}
 
-	// Execute transaction
 	execParams := []interface{}{
 		txBytes.TxBytes,
 		[]string{signature},
@@ -752,13 +702,11 @@ func (s *SuiClient) executeTransaction(ctx context.Context, moveCallReq MoveCall
 	if err != nil {
 		return "", fmt.Errorf("failed to execute transaction: %v", err)
 	}
-
 	var txResult TransactionBlockResponse
 	if err := json.Unmarshal(execResp.Result, &txResult); err != nil {
 		return "", fmt.Errorf("failed to parse execution result: %v", err)
 	}
 
-	// Check transaction status
 	if effects, ok := txResult.Effects["status"]; ok {
 		if status, ok := effects.(map[string]interface{}); ok {
 			if status["status"] != "success" {
@@ -767,7 +715,6 @@ func (s *SuiClient) executeTransaction(ctx context.Context, moveCallReq MoveCall
 		}
 	}
 
-	// Log events for debugging
 	eventType := fmt.Sprintf("%s::%s::%s", s.config.PackageID, s.config.ModuleName, expectedEventSuffix)
 	eventFound := false
 	for _, event := range txResult.Events {
@@ -785,12 +732,10 @@ func (s *SuiClient) executeTransaction(ctx context.Context, moveCallReq MoveCall
 	return txResult.Digest, nil
 }
 
-// Add helper method to get address
 func (s *SuiClient) GetAddress() string {
 	return s.address
 }
 
-// Enhanced GetStakePool with better error handling
 func (s *SuiClient) GetStakePool(poolID string) (map[string]interface{}, error) {
 	if poolID == "" {
 		return nil, fmt.Errorf("pool ID is required")
@@ -814,7 +759,6 @@ func (s *SuiClient) GetStakePool(poolID string) (map[string]interface{}, error) 
 		return nil, fmt.Errorf("failed to parse stake pool response: %v", err)
 	}
 
-	// Check if object exists
 	if data, ok := result["data"]; ok {
 		if dataMap, ok := data.(map[string]interface{}); ok {
 			if dataMap["objectId"] == nil {
@@ -826,7 +770,6 @@ func (s *SuiClient) GetStakePool(poolID string) (map[string]interface{}, error) 
 	return result, nil
 }
 
-// Method to validate pool configuration
 func (s *SuiClient) ValidatePoolConfig(ctx context.Context) error {
 	if s.config.PoolID == "" {
 		return fmt.Errorf("pool ID not configured")
@@ -837,8 +780,6 @@ func (s *SuiClient) ValidatePoolConfig(ctx context.Context) error {
 	if s.config.ModuleName == "" {
 		return fmt.Errorf("module name not configured")
 	}
-
-	// Try to fetch the pool to validate it exists
 	_, err := s.GetStakePool(s.config.PoolID)
 	if err != nil {
 		return fmt.Errorf("invalid pool configuration: %v", err)
@@ -847,9 +788,6 @@ func (s *SuiClient) ValidatePoolConfig(ctx context.Context) error {
 	return nil
 }
 
-// Additional utility methods for better functionality
-
-// GetCoinsByType retrieves coins of a specific type with pagination
 func (s *SuiClient) GetCoinsByType(ctx context.Context, coinType string, cursor *string, limit int) ([]map[string]interface{}, *string, error) {
 	params := []interface{}{
 		s.address,
@@ -880,7 +818,6 @@ func (s *SuiClient) GetCoinsByType(ctx context.Context, coinType string, cursor 
 	return result.Data, nextCursor, nil
 }
 
-// GetAllCoins retrieves all coins for the address
 func (s *SuiClient) GetAllCoins(ctx context.Context, coinType string) ([]map[string]interface{}, error) {
 	var allCoins []map[string]interface{}
 	var cursor *string
@@ -902,7 +839,6 @@ func (s *SuiClient) GetAllCoins(ctx context.Context, coinType string) ([]map[str
 	return allCoins, nil
 }
 
-// GetTotalBalance calculates total balance across all coins of a type
 func (s *SuiClient) GetTotalBalance(ctx context.Context, coinType string) (uint64, error) {
 	coins, err := s.GetAllCoins(ctx, coinType)
 	if err != nil {
@@ -923,7 +859,6 @@ func (s *SuiClient) GetTotalBalance(ctx context.Context, coinType string) (uint6
 	return totalBalance, nil
 }
 
-// WaitForTransaction waits for a transaction to be confirmed
 func (s *SuiClient) WaitForTransaction(ctx context.Context, digest string, maxWaitTime time.Duration) (interface{}, error) {
 	if digest == "" {
 		return nil, fmt.Errorf("transaction digest is required")
@@ -942,14 +877,12 @@ func (s *SuiClient) WaitForTransaction(ctx context.Context, digest string, maxWa
 			if err == nil {
 				return tx, nil
 			}
-			// Continue waiting if transaction not found yet
 		case <-ctx.Done():
 			return nil, ctx.Err()
 		}
 	}
 }
 
-// EstimateGas estimates gas cost for a transaction
 func (s *SuiClient) EstimateGas(ctx context.Context, txBytes []byte) (uint64, error) {
 	txBytesStr := base64.StdEncoding.EncodeToString(txBytes)
 
@@ -980,7 +913,6 @@ func (s *SuiClient) EstimateGas(ctx context.Context, txBytes []byte) (uint64, er
 	return totalGas, nil
 }
 
-// GetObjectsOwnedByAddress retrieves objects owned by the address
 func (s *SuiClient) GetObjectsOwnedByAddress(ctx context.Context, objectType *string) ([]map[string]interface{}, error) {
 	params := []interface{}{
 		s.address,
@@ -1009,9 +941,7 @@ func (s *SuiClient) GetObjectsOwnedByAddress(ctx context.Context, objectType *st
 	return result.Data, nil
 }
 
-// Health check method
 func (s *SuiClient) HealthCheck(ctx context.Context) error {
-	// Try to get the latest checkpoint sequence number
 	resp, err := s.makeRPCCall(ctx, "sui_getLatestCheckpointSequenceNumber", []interface{}{})
 	if err != nil {
 		return fmt.Errorf("health check failed: %v", err)
@@ -1028,7 +958,6 @@ func (s *SuiClient) HealthCheck(ctx context.Context) error {
 	return nil
 }
 
-// GetNetworkInfo retrieves network information
 func (s *SuiClient) GetNetworkInfo(ctx context.Context) (map[string]interface{}, error) {
 	resp, err := s.makeRPCCall(ctx, "rpc.discover", []interface{}{})
 	if err != nil {

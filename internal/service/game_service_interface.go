@@ -10,4 +10,4 @@ type GameServiceInterface interface {
 	PayWinner(req *request.PayWinnerRequest) (*response.PayWinnerResponse, error)
 	GetStakeHistory(address string) (*response.StakeHistoryResponse, error)
 	GetGameHistory(address string) (*response.GameHistoryResponse, error)
-} // ✅ Removed the trailing comma
+}

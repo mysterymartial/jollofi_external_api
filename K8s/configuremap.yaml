@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jollfi-gaming-api-config
+data:
+  .env: |
+    SUI_PRIVATE_KEY=cc7f2d67aa408e3940c7d93863e3d92b14e48caa7e2ee5a0143f5ac5499ce152
+    SUI_PACKAGE_ID=0x710ca9bcfa68e498e92210ebee8cf88f2d138689ed2250c1fdcbf317e06c88ab
+    SUI_POOL_ID=0x825619d2b0988251cd42a9f65b40d05b624bacf6d8cacc921f56d9e56802ab2e
+    MONGODB_URI=mongodb://localhost:27017
+    MONGO_URI=mongodb://mongo:27017
+    SUI_NETWORK_URL=https://fullnode.testnet.sui.io:443
+    SUI_MODULE_NAME=jollfi_wallet
+    PORT=8080
+    JWT_SECRET=31cee19e5e2793312c6e91989c4671cbc833d7bdd38fca2cc919affe9701e1f3
+    LOG_LEVEL=info
+    API_KEY=public-jollfi-api-key-2025
+    ENABLE_CORS=false
+    ENABLE_LOGGING=true
+    RATE_LIMIT=100
+    GIN_MODE=release
+    MONGO_DATABASE=jollfiGamesApi

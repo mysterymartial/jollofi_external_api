@@ -16,31 +16,24 @@ import (
 )
 
 func main() {
-	// Load configuration
 	cfg := config.LoadConfig()
 
-	// Validate required configuration
 	if err := cfg.ValidateConfig(); err != nil {
 		log.Fatalf("Configuration validation failed: %v", err)
 	}
-
-	// Initialize dependencies
 	suiClient, mongoClient := initializeDependencies(cfg)
+
 	defer mongoClient.Close()
 
-	// Initialize services
 	gameService := service.NewGameService(suiClient, mongoClient)
 
-	// Setup routes
 	router := routes.SetupRoutes(gameService, cfg)
 
 	// Start server
 	startServer(router, cfg)
 }
 
-// initializeDependencies initializes Sui and MongoDB clients
 func initializeDependencies(cfg *config.Config) (*data.SuiClient, *data.MongoClient) {
-	// Initialize Sui client
 	suiConfig := &data.Config{
 		PackageID:  cfg.PackageID,
 		ModuleName: cfg.ModuleName,
@@ -52,7 +45,6 @@ func initializeDependencies(cfg *config.Config) (*data.SuiClient, *data.MongoCli
 		log.Fatalf("Failed to initialize Sui client: %v", err)
 	}
 
-	// Test Sui connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -61,10 +53,8 @@ func initializeDependencies(cfg *config.Config) (*data.SuiClient, *data.MongoCli
 	}
 	log.Println("✅ Sui client connected successfully")
 
-	// Initialize MongoDB client
 	mongoClient := data.NewMongoClient(cfg.MongoURI, cfg.MongoDatabase)
 
-	// Test MongoDB connection with retry
 	const maxRetries = 5
 	const retryDelay = 2 * time.Second
 	for i := 0; i < maxRetries; i++ {
@@ -79,12 +69,10 @@ func initializeDependencies(cfg *config.Config) (*data.SuiClient, *data.MongoCli
 		time.Sleep(retryDelay)
 	}
 	log.Fatalf("MongoDB ping failed after %d attempts: %v", maxRetries, err)
-	return nil, nil // Unreachable
+	return nil, nil
 }
 
-// startServer starts the HTTP server with graceful shutdown
 func startServer(router http.Handler, cfg *config.Config) {
-	// Create HTTP server
 	server := &http.Server{
 		Addr:         ":" + cfg.Port,
 		Handler:      router,
@@ -93,7 +81,6 @@ func startServer(router http.Handler, cfg *config.Config) {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	// Start server in a goroutine
 	go func() {
 		logServerInfo(cfg)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -101,13 +88,11 @@ func startServer(router http.Handler, cfg *config.Config) {
 		}
 	}()
 
-	// Wait for interrupt signal to gracefully shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	log.Println("🛑 Shutting down server...")
 
-	// Graceful shutdown with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -118,7 +103,6 @@ func startServer(router http.Handler, cfg *config.Config) {
 	}
 }
 
-// logServerInfo logs server startup information
 func logServerInfo(cfg *config.Config) {
 	log.Println("🚀 ================================")
 	log.Println("🚀 Jollfi Gaming API Starting...")

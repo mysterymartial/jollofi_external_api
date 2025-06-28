@@ -16,7 +16,6 @@ import (
 	"jollfi-gaming-api/internal/config"
 )
 
-// CORSMiddleware handles Cross-Origin Resource Sharing
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
@@ -31,7 +30,6 @@ func CORSMiddleware() gin.HandlerFunc {
 	}
 }
 
-// LoggerMiddleware provides custom logging with MongoDB
 func LoggerMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
@@ -60,7 +58,6 @@ func LoggerMiddleware() gin.HandlerFunc {
 	}
 }
 
-// RecoveryMiddleware handles panics
 func RecoveryMiddleware() gin.HandlerFunc {
 	return gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
 		if err, ok := recovered.(string); ok {
@@ -78,7 +75,6 @@ func RecoveryMiddleware() gin.HandlerFunc {
 	})
 }
 
-// HealthCheckHandler provides health check endpoint
 func HealthCheckHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -91,7 +87,6 @@ func HealthCheckHandler() gin.HandlerFunc {
 	}
 }
 
-// RequestIDMiddleware adds unique request ID
 func RequestIDMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestID := fmt.Sprintf("%d", time.Now().UnixNano())
@@ -101,7 +96,6 @@ func RequestIDMiddleware() gin.HandlerFunc {
 	}
 }
 
-// APIKeyMiddleware allows access with no API key or valid key
 func APIKeyMiddleware(apiKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if apiKey == "" {
@@ -124,7 +118,6 @@ func APIKeyMiddleware(apiKey string) gin.HandlerFunc {
 	}
 }
 
-// RateLimitMiddleware implements rate limiting per IP
 func RateLimitMiddleware(requestsPerMinute int) gin.HandlerFunc {
 	type client struct {
 		limiter  *rate.Limiter
@@ -173,7 +166,6 @@ func RateLimitMiddleware(requestsPerMinute int) gin.HandlerFunc {
 	}
 }
 
-// SecurityHeadersMiddleware adds security headers
 func SecurityHeadersMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Header("X-Content-Type-Options", "nosniff")
@@ -184,7 +176,6 @@ func SecurityHeadersMiddleware() gin.HandlerFunc {
 	}
 }
 
-// TimeoutMiddleware adds request timeout
 func TimeoutMiddleware(timeout time.Duration) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
@@ -208,7 +199,6 @@ func TimeoutMiddleware(timeout time.Duration) gin.HandlerFunc {
 	}
 }
 
-// ValidationMiddleware validates request parameters
 func ValidationMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 1048576) // 1MB limit
@@ -216,7 +206,6 @@ func ValidationMiddleware() gin.HandlerFunc {
 	}
 }
 
-// MetricsMiddleware collects basic metrics
 func MetricsMiddleware() gin.HandlerFunc {
 	var (
 		requestCount = make(map[string]int)

@@ -29,20 +29,21 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
-	// Load .env file
 	if err := godotenv.Load(); err != nil {
 		fmt.Printf("Warning: Could not load .env file: %v\n", err)
 	}
 
-	// Get Mongo URI
 	mongoURI := getEnv("MONGO_URI", "")
 	if mongoURI == "" {
 		mongoURI = getEnv("MONGODB_URI", "")
 	}
-	// If running locally (not in Docker), prefer MONGODB_URI
-	if _, exists := os.LookupEnv("DOCKER_ENV"); !exists {
-		mongoURI = getEnv("MONGODB_URI", "")
+
+	if _, exists := os.LookupEnv("DOCKERENV"); !exists {
+		if localURI := getEnv("MONGODB_URI", ""); localURI != "" {
+			mongoURI = localURI
+		}
 	}
+
 	fmt.Printf("DEBUG: MongoURI=%s\n", mongoURI)
 
 	return &Config{
@@ -72,6 +73,7 @@ func (c *Config) ValidateConfig() error {
 		"MONGO_URI":       c.MongoURI,
 		"MONGO_DATABASE":  c.MongoDatabase,
 	}
+
 	for key, value := range required {
 		if value == "" {
 			return fmt.Errorf("required environment variable %s is not set", key)

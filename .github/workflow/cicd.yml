@@ -1,33 +1,97 @@
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.22'
-
-      - name: Install dependencies
-        run: go mod download
-
-      - name: Run tests
-        run: go test ./internal/tests/...
-
-      - name: Build Docker image
-        run: docker build -t jollfi-gaming-api:latest .
-
-      - name: Dummy deployment
-        run: echo "Deploying to dummy environment at https://dummy-jollfi-gaming-api.com"
+#name: CI/CD Pipeline
+#
+#on:
+#  push:
+#    branches:
+#      - dev
+#  pull_request:
+#    branches:
+#      - master
+#  workflow_dispatch:
+#
+#jobs:
+#  test:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Set up Go
+#        uses: actions/setup-go@v5
+#        with:
+#          go-version: '1.20'
+#
+#      - name: Cache Go modules
+#        uses: actions/cache@v4
+#        with:
+#          path: ~/go/pkg/mod
+#          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+#          restore-keys: ${{ runner.os }}-go-
+#
+#      - name: Run unit tests
+#        run: go test ./... -v -cover
+#
+#      - name: Start MongoDB
+#        uses: supercharge/mongodb-github-action@1.10.0
+#        with:
+#          mongodb-version: 'latest'
+#
+#      - name: Run integration tests
+#        run: |
+#          export MONGODB_URI=mongodb://localhost:27017
+#          export MONGO_DATABASE=jollfi_games
+#          go test ./... -v -tags=integration
+#
+#  merge-to-master:
+#    needs: test
+#    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Set up Git
+#        run: |
+#          git config --global user.name "GitHub Actions"
+#          git config --global user.email "actions@github.com"
+#
+#      - name: Push to master
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          git checkout master
+#          git merge dev --no-ff -m "Merge dev to master after tests pass"
+#          git push origin master
+#
+#  deploy:
+#    needs: merge-to-master
+#    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Set up Go
+#        uses: actions/setup-go@v5
+#        with:
+#          go-version: '1.20'
+#
+#      - name: Build for Netlify
+#        run: |
+#          GOOS=linux GOARCH=amd64 go build -o functions/api/main ./functions/api
+#
+#      - name: Deploy to Netlify
+#        uses: nwtgck/actions-netlify@v2.0
+#        with:
+#          publish-dir: './'
+#          production-branch: master
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          deploy-message: "Deploy from GitHub Actions"
+#          enable-pull-request-comment: true
+#          enable-commit-comment: true
+#          overwrites-pull-request-comment: true
+#        env:
+#          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+#          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

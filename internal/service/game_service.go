@@ -20,10 +20,8 @@ type GameService struct {
 	mongoClient interfaces.MongoClientInterface
 }
 
-// Ensure GameService implements GameServiceInterface at compile time
 var _ GameServiceInterface = (*GameService)(nil)
 
-// Constructor now accepts interfaces instead of concrete types
 func NewGameService(suiClient interfaces.SuiClientInterface, mongoClient interfaces.MongoClientInterface) *GameService {
 	return &GameService{
 		suiClient:   suiClient,
@@ -32,7 +30,6 @@ func NewGameService(suiClient interfaces.SuiClientInterface, mongoClient interfa
 }
 
 func (s *GameService) StakeGame(req *request.StakeRequest) (*response.StakeResponse, error) {
-	// Basic validation only
 	if req.RequesterCoinID == "" || req.AccepterCoinID == "" || req.StakeAmount == 0 {
 		return &response.StakeResponse{
 			Success: false,
@@ -46,11 +43,8 @@ func (s *GameService) StakeGame(req *request.StakeRequest) (*response.StakeRespo
 		}, fmt.Errorf("addresses are required")
 	}
 
-	// Log the fee deduction info
 	log.Printf("🔄 Processing stake: Amount per player: %d SUI (10%% fee will be deducted by blockchain)", req.StakeAmount)
 	log.Printf("🔄 Requester: %s, Accepter: %s", req.RequesterAddress, req.AccepterAddress)
-
-	// Call blockchain - let it handle everything
 	txDigest, err := s.suiClient.ExternalStake(
 		req.RequesterCoinID,
 		req.AccepterCoinID,
@@ -65,7 +59,6 @@ func (s *GameService) StakeGame(req *request.StakeRequest) (*response.StakeRespo
 		}, err
 	}
 
-	// Create stake record with addresses for history tracking
 	stake := models.Stake{
 		RequesterCoinID:  req.RequesterCoinID,
 		AccepterCoinID:   req.AccepterCoinID,
@@ -92,7 +85,6 @@ func (s *GameService) StakeGame(req *request.StakeRequest) (*response.StakeRespo
 }
 
 func (s *GameService) PayWinner(req *request.PayWinnerRequest) (*response.PayWinnerResponse, error) {
-	// Basic validation only
 	if req.RequesterAddress == "" || req.AccepterAddress == "" || req.StakeAmount == 0 {
 		return &response.PayWinnerResponse{
 			Success: false,
@@ -103,7 +95,6 @@ func (s *GameService) PayWinner(req *request.PayWinnerRequest) (*response.PayWin
 	log.Printf("🔄 Processing winner payment: Requester Score: %d, Accepter Score: %d, Original Stake: %d",
 		req.RequesterScore, req.AccepterScore, req.StakeAmount)
 
-	// Call blockchain - let it handle all prize logic
 	txDigest, err := s.suiClient.ExternalPayWinner(
 		req.RequesterAddress,
 		req.AccepterAddress,
@@ -120,7 +111,6 @@ func (s *GameService) PayWinner(req *request.PayWinnerRequest) (*response.PayWin
 		}, err
 	}
 
-	// Create pay winner record
 	payWinner := models.PayWinner{
 		RequesterAddress: req.RequesterAddress,
 		AccepterAddress:  req.AccepterAddress,
@@ -154,14 +144,12 @@ func (s *GameService) GetStakeHistory(address string) (*response.StakeHistoryRes
 	}
 
 	collection := s.mongoClient.GetDatabase("jollfi_games").Collection("stakes")
-	// Find stakes where user participated (either as requester or accepter)
 	filter := bson.M{
 		"$or": []bson.M{
 			{"requester_address": address},
 			{"accepter_address": address},
 		},
 	}
-
 	opts := options.Find().SetSort(bson.M{"timestamp": -1}).SetLimit(50) // Latest 50 stakes
 	cursor, err := collection.Find(context.Background(), filter, opts)
 	if err != nil {
@@ -199,7 +187,6 @@ func (s *GameService) GetGameHistory(address string) (*response.GameHistoryRespo
 	}
 
 	collection := s.mongoClient.GetDatabase("jollfi_games").Collection("pay_winners")
-	// Find games where user participated (either as requester or accepter)
 	filter := bson.M{
 		"$or": []bson.M{
 			{"requester_address": address},
@@ -235,7 +222,6 @@ func (s *GameService) GetGameHistory(address string) (*response.GameHistoryRespo
 	}, nil
 }
 
-// test function
 func NewTestGameService(suiClient interfaces.SuiClientInterface, mongoClient interfaces.MongoClientInterface, cfg *config.Config) GameServiceInterface {
 	return &GameService{
 		suiClient:   suiClient,

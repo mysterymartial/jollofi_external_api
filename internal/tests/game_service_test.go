@@ -12,11 +12,8 @@ import (
 )
 
 func TestGameService_StakeGame_Success(t *testing.T) {
-	// Create mocks
 	mockSuiClient := mocks.NewMockSuiClient()
 	mockMongoClient := mocks.NewMockMongoClient()
-
-	// Set up mock behavior for successful stake
 	mockSuiClient.ExternalStakeFunc = func(requesterCoinID, accepterCoinID string, amount uint64, ctx context.Context) (string, error) {
 		if requesterCoinID != "0xcoin123" {
 			t.Errorf("Expected requester coin ID '0xcoin123', got %s", requesterCoinID)
@@ -30,10 +27,7 @@ func TestGameService_StakeGame_Success(t *testing.T) {
 		return "mock_stake_digest", nil
 	}
 
-	// Create service with mocks
 	gameService := service.NewGameService(mockSuiClient, mockMongoClient)
-
-	// Create test request
 	req := &request.StakeRequest{
 		RequesterCoinID:  "0xcoin123",
 		AccepterCoinID:   "0xcoin456",
@@ -42,7 +36,6 @@ func TestGameService_StakeGame_Success(t *testing.T) {
 		StakeAmount:      100,
 	}
 
-	// Test StakeGame
 	resp, err := gameService.StakeGame(req)
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
@@ -65,9 +58,8 @@ func TestGameService_StakeGame_InvalidAmount(t *testing.T) {
 		AccepterCoinID:   "0xcoin456",
 		RequesterAddress: "0x123",
 		AccepterAddress:  "0x456",
-		StakeAmount:      0, // Invalid amount
+		StakeAmount:      0,
 	}
-
 	resp, err := gameService.StakeGame(req)
 	if err == nil {
 		t.Errorf("Expected error for invalid stake amount, got nil")
@@ -81,7 +73,6 @@ func TestGameService_StakeGame_BlockchainFailure(t *testing.T) {
 	mockSuiClient := mocks.NewMockSuiClient()
 	mockMongoClient := mocks.NewMockMongoClient()
 
-	// Set mock to fail
 	mockSuiClient.SetShouldFail(true)
 
 	gameService := service.NewGameService(mockSuiClient, mockMongoClient)
@@ -163,7 +154,6 @@ func TestGameService_PayWinner_BlockchainFailure(t *testing.T) {
 	mockSuiClient := mocks.NewMockSuiClient()
 	mockMongoClient := mocks.NewMockMongoClient()
 
-	// Set mock to fail
 	mockSuiClient.SetShouldFail(true)
 
 	gameService := service.NewGameService(mockSuiClient, mockMongoClient)
@@ -200,7 +190,7 @@ func TestGameService_GetStakeHistory_Success(t *testing.T) {
 	if !resp.Success {
 		t.Errorf("Expected success=true, got %v", resp.Success)
 	}
-	// Mock returns empty results
+
 	if resp.Count != 0 {
 		t.Errorf("Expected count 0, got %d", resp.Count)
 	}
@@ -238,7 +228,6 @@ func TestGameService_GetGameHistory_Success(t *testing.T) {
 	if !resp.Success {
 		t.Errorf("Expected success=true, got %v", resp.Success)
 	}
-	// Mock returns empty results
 	if resp.Count != 0 {
 		t.Errorf("Expected count 0, got %d", resp.Count)
 	}
@@ -264,7 +253,6 @@ func TestGameService_GetGameHistory_EmptyAddress(t *testing.T) {
 	}
 }
 
-// Test multiple validation scenarios
 func TestGameService_StakeGame_ValidationScenarios(t *testing.T) {
 	mockSuiClient := mocks.NewMockSuiClient()
 	mockMongoClient := mocks.NewMockMongoClient()
@@ -348,7 +336,6 @@ func TestGameService_StakeGame_ValidationScenarios(t *testing.T) {
 	}
 }
 
-// Test PayWinner validation scenarios
 func TestGameService_PayWinner_ValidationScenarios(t *testing.T) {
 	mockSuiClient := mocks.NewMockSuiClient()
 	mockMongoClient := mocks.NewMockMongoClient()
@@ -433,12 +420,10 @@ func TestGameService_PayWinner_ValidationScenarios(t *testing.T) {
 	}
 }
 
-// Test custom mock function behavior
 func TestGameService_CustomMockBehavior(t *testing.T) {
 	mockSuiClient := mocks.NewMockSuiClient()
 	mockMongoClient := mocks.NewMockMongoClient()
 
-	// Test custom stake function
 	mockSuiClient.ExternalStakeFunc = func(requesterCoinID, accepterCoinID string, amount uint64, ctx context.Context) (string, error) {
 		return fmt.Sprintf("custom_stake_%s_%s_%d", requesterCoinID, accepterCoinID, amount), nil
 	}
