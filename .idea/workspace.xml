@@ -7,29 +7,6 @@
     <list default="true" id="12ab46a8-f0ab-4ea0-bd8c-6e5dda149148" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/K8s/deployment.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/K8s/deployment.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/K8s/ingress.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/K8s/ingress.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/K8s/service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/K8s/service.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/api/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/api/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/data/mongo_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/data/mongo_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/data/mongo_wrapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/data/mongo_wrapper.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/data/sui_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/data/sui_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/interfaces/mongodb_interface.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/interfaces/mongodb_interface.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/interfaces/sui_client_interface.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/interfaces/sui_client_interface.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/middleware/middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/middleware/middleware.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/mocks/game_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/mocks/game_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/mocks/mongo_client_mock.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/mocks/mongo_client_mock.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/mocks/sui_client_mock.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/mocks/sui_client_mock.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/routes/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/routes/routes.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/service/game_service.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/service/game_service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/service/game_service_interface.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/service/game_service_interface.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/service/game_service_mock.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/tests/game_service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/tests/game_service_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/tests/mongo_client_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/tests/mongo_client_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/tests/routes_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/tests/routes_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/tests/sui_client_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/tests/sui_client_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
