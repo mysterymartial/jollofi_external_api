@@ -1561,5 +1561,3 @@ func TestRouteSecurity(t *testing.T) {
 		}
 	}
 }
-
-//helper

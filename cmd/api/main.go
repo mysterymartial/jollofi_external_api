@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joho/godotenv"
 	"jollfi-gaming-api/internal/config"
 	"jollfi-gaming-api/internal/data"
 	"jollfi-gaming-api/internal/routes"
@@ -17,11 +16,6 @@ import (
 )
 
 func main() {
-	// Load environment variables
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using system environment variables")
-	}
-
 	// Load configuration
 	cfg := config.LoadConfig()
 
@@ -68,18 +62,24 @@ func initializeDependencies(cfg *config.Config) (*data.SuiClient, *data.MongoCli
 	log.Println("✅ Sui client connected successfully")
 
 	// Initialize MongoDB client
-	mongoClient := data.NewMongoClient(cfg.MongoURI, cfg.GetDatabaseName())
+	mongoClient := data.NewMongoClient(cfg.MongoURI, cfg.MongoDatabase)
 
-	// Test MongoDB connection - FIX: Add context parameter
-	ctx2, cancel2 := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel2()
-
-	if err := mongoClient.Ping(ctx2); err != nil {
-		log.Fatalf("MongoDB ping failed: %v", err)
+	// Test MongoDB connection with retry
+	const maxRetries = 5
+	const retryDelay = 2 * time.Second
+	for i := 0; i < maxRetries; i++ {
+		ctx2, cancel2 := context.WithTimeout(context.Background(), 10*time.Second)
+		err := mongoClient.Ping(ctx2)
+		cancel2()
+		if err == nil {
+			log.Println("✅ MongoDB connected successfully")
+			return suiClient, mongoClient
+		}
+		log.Printf("MongoDB ping attempt %d failed: %v", i+1, err)
+		time.Sleep(retryDelay)
 	}
-	log.Println("✅ MongoDB connected successfully")
-
-	return suiClient, mongoClient
+	log.Fatalf("MongoDB ping failed after %d attempts: %v", maxRetries, err)
+	return nil, nil // Unreachable
 }
 
 // startServer starts the HTTP server with graceful shutdown
@@ -126,7 +126,7 @@ func logServerInfo(cfg *config.Config) {
 	log.Printf("📍 Environment: %s", cfg.Environment)
 	log.Printf("🌐 Server Port: %s", cfg.Port)
 	log.Printf("🔗 Sui Network: %s", cfg.SuiNetworkURL)
-	log.Printf("🗄️  MongoDB Database: %s", cfg.GetDatabaseName())
+	log.Printf("🗄️  MongoDB Database: %s", cfg.MongoDatabase)
 	log.Printf("📦 Package ID: %s", cfg.PackageID)
 	log.Printf("🏊 Pool ID: %s", cfg.PoolID)
 	log.Printf("🔧 Module Name: %s", cfg.ModuleName)

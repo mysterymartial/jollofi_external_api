@@ -33,15 +33,27 @@ func LoadConfig() *Config {
 	if err := godotenv.Load(); err != nil {
 		fmt.Printf("Warning: Could not load .env file: %v\n", err)
 	}
+
+	// Get Mongo URI
+	mongoURI := getEnv("MONGO_URI", "")
+	if mongoURI == "" {
+		mongoURI = getEnv("MONGODB_URI", "")
+	}
+	// If running locally (not in Docker), prefer MONGODB_URI
+	if _, exists := os.LookupEnv("DOCKER_ENV"); !exists {
+		mongoURI = getEnv("MONGODB_URI", "")
+	}
+	fmt.Printf("DEBUG: MongoURI=%s\n", mongoURI)
+
 	return &Config{
-		Port:          getEnv("PORT", "8080"),
-		Environment:   getEnv("ENVIRONMENT", "development"),
-		MongoURI:      getEnv("MONGODB_URI", "mongodb://localhost:27017"),
-		MongoDatabase: getEnv("MONGO_DATABASE", "jollfi_games"),
-		SuiNetworkURL: getEnv("SUI_NETWORK_URL", "https://fullnode.testnet.sui.io:443"),
+		Port:          getEnv("PORT", ""),
+		Environment:   getEnv("ENVIRONMENT", ""),
+		MongoURI:      mongoURI,
+		MongoDatabase: getEnv("MONGO_DATABASE", ""),
+		SuiNetworkURL: getEnv("SUI_NETWORK_URL", ""),
 		PackageID:     getEnv("SUI_PACKAGE_ID", ""),
 		PoolID:        getEnv("SUI_POOL_ID", ""),
-		ModuleName:    getEnv("SUI_MODULE_NAME", "jollfi_wallet"),
+		ModuleName:    getEnv("SUI_MODULE_NAME", ""),
 		SuiPrivateKey: getEnv("SUI_PRIVATE_KEY", ""),
 		JWTSecret:     getEnv("JWT_SECRET", generateRandomSecret()),
 		APIKey:        getEnv("API_KEY", ""),
@@ -57,7 +69,8 @@ func (c *Config) ValidateConfig() error {
 		"SUI_PRIVATE_KEY": c.SuiPrivateKey,
 		"SUI_PACKAGE_ID":  c.PackageID,
 		"SUI_POOL_ID":     c.PoolID,
-		"MONGODB_URI":     c.MongoURI,
+		"MONGO_URI":       c.MongoURI,
+		"MONGO_DATABASE":  c.MongoDatabase,
 	}
 	for key, value := range required {
 		if value == "" {

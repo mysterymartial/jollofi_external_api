@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jollfi-gaming-api-ingress
+spec:
+  rules:
+    - host: jollfi-gaming-api.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jollfi-gaming-api-service
+                port:
+                  number: 80

@@ -70,26 +70,43 @@ type MoveCallRequest struct {
 	GasBudget       string        `json:"gasBudget"`
 }
 
-func NewSuiClient(rpcURL string, privateKeyHex string, cfg *Config) (*SuiClient, error) {
-	// Remove 0x prefix if present
-	if len(privateKeyHex) > 2 && privateKeyHex[:2] == "0x" {
-		privateKeyHex = privateKeyHex[2:]
+func NewSuiClient(rpcURL string, privateKeyStr string, cfg *Config) (*SuiClient, error) {
+	var privateKeyBytes []byte
+	var err error
+
+	// Try decoding as hex
+	privateKeyBytes, err = hex.DecodeString(privateKeyStr)
+	if err != nil {
+		// Try decoding as base64 (Sui CLI format with flag byte)
+		privateKeyBytes, err = base64.StdEncoding.DecodeString(privateKeyStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode private key: %v", err)
+		}
+		// Sui CLI base64 keys include a 0x00 flag byte; use the 32-byte seed
+		if len(privateKeyBytes) == 33 && privateKeyBytes[0] == 0x00 {
+			privateKeyBytes = privateKeyBytes[1:33]
+		}
 	}
 
-	// Decode private key
-	privateKeyBytes, err := hex.DecodeString(privateKeyHex)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode private key: %v", err)
+	// Remove 0x prefix if present
+	if len(privateKeyStr) > 2 && privateKeyStr[:2] == "0x" {
+		privateKeyStr = privateKeyStr[2:]
+		privateKeyBytes, err = hex.DecodeString(privateKeyStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode hex private key: %v", err)
+		}
 	}
+
+	// Verify key length
 	if len(privateKeyBytes) != 32 {
-		return nil, fmt.Errorf("private key must be 32 bytes")
+		return nil, fmt.Errorf("private key must be 32 bytes, got %d", len(privateKeyBytes))
 	}
 
 	// Generate key pair
 	privateKey := ed25519.NewKeyFromSeed(privateKeyBytes)
 	publicKey := privateKey.Public().(ed25519.PublicKey)
 
-	// Generate Sui address (simplified - you might need proper address derivation)
+	// Generate Sui address (simplified - adjust if needed for proper derivation)
 	address := fmt.Sprintf("0x%x", publicKey[:20])
 
 	return &SuiClient{
@@ -474,7 +491,7 @@ func (s *SuiClient) BuildTransactionBlock(ctx context.Context, params interface{
 	return decodedBytes, nil
 }
 
-// Helper methods (keeping all your existing helper methods)
+// Helper methods
 
 func (s *SuiClient) signTransaction(txBytes string) (string, error) {
 	// Decode transaction bytes
@@ -994,15 +1011,18 @@ func (s *SuiClient) GetObjectsOwnedByAddress(ctx context.Context, objectType *st
 
 // Health check method
 func (s *SuiClient) HealthCheck(ctx context.Context) error {
-	// Try to get the current epoch
-	resp, err := s.makeRPCCall(ctx, "suix_getCurrentEpoch", []interface{}{})
+	// Try to get the latest checkpoint sequence number
+	resp, err := s.makeRPCCall(ctx, "sui_getLatestCheckpointSequenceNumber", []interface{}{})
 	if err != nil {
 		return fmt.Errorf("health check failed: %v", err)
 	}
 
-	var epoch interface{}
-	if err := json.Unmarshal(resp.Result, &epoch); err != nil {
+	var checkpoint string
+	if err := json.Unmarshal(resp.Result, &checkpoint); err != nil {
 		return fmt.Errorf("health check failed to parse response: %v", err)
+	}
+	if checkpoint == "" {
+		return fmt.Errorf("health check failed: empty checkpoint sequence number")
 	}
 
 	return nil
