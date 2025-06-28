@@ -1,3 +1,31 @@
+# Ignore environment variables
 .env
-  *.log
-  secrets/
+
+# Ignore Kubernetes files in K8s folder
+K8s/configmap.yaml
+
+
+# Ignore Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+
+# Ignore test and coverage files
+*.test
+*.out
+coverage.txt
+
+# Ignore IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignore temporary files
+tmp/
+*.tmp
+*.bak
+*.log

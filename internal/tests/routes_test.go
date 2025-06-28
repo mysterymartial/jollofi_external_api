@@ -1179,7 +1179,6 @@ func TestErrorResponseFormat(t *testing.T) {
 				return
 			}
 
-			// Check error response format consistency
 			if success, ok := response["success"].(bool); !ok {
 				t.Errorf("Error response should have 'success' field")
 			} else if success {
@@ -1190,7 +1189,6 @@ func TestErrorResponseFormat(t *testing.T) {
 				t.Errorf("Error response should have 'error' field with string value")
 			}
 
-			// Check that error message is not empty
 			if errorMsg, ok := response["error"].(string); ok && errorMsg == "" {
 				t.Errorf("Error message should not be empty")
 			}
@@ -1198,7 +1196,6 @@ func TestErrorResponseFormat(t *testing.T) {
 	}
 }
 
-// Test success response format consistency
 func TestSuccessResponseFormat(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -1252,7 +1249,6 @@ func TestSuccessResponseFormat(t *testing.T) {
 				return
 			}
 
-			// Parse response
 			var response map[string]interface{}
 			err := json.Unmarshal(w.Body.Bytes(), &response)
 			if err != nil {
@@ -1260,14 +1256,12 @@ func TestSuccessResponseFormat(t *testing.T) {
 				return
 			}
 
-			// Check success response format consistency
 			if success, ok := response["success"].(bool); !ok {
 				t.Errorf("Success response should have 'success' field")
 			} else if !success {
 				t.Errorf("Success response should have success=true")
 			}
 
-			// Different endpoints may have different additional fields, but all should have success
 		})
 	}
 }
@@ -1312,7 +1306,7 @@ func TestRequestValidationEdgeCases(t *testing.T) {
 				"accepter_address":  "0xabcdef1234567890abcdef1234567890abcdef12",
 				"stake_amount":      999999999999999999,
 			},
-			error: "", // Should be valid
+			error: "",
 		},
 		{
 			name: "Empty coin IDs",
@@ -1353,7 +1347,7 @@ func TestRequestValidationEdgeCases(t *testing.T) {
 					t.Errorf("Expected success for case '%s', got status %d", tc.name, w.Code)
 				}
 			} else {
-				// Should fail with validation error
+
 				if w.Code != http.StatusBadRequest {
 					t.Errorf("Expected status 400 for case '%s', got %d", tc.name, w.Code)
 				}
@@ -1373,11 +1367,9 @@ func TestRequestValidationEdgeCases(t *testing.T) {
 	}
 }
 
-// Test configuration-based middleware activation
 func TestConfigBasedMiddleware(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	// Create mocks
 	mockSuiClient := mocks.NewMockSuiClient()
 	mockMongoClient := mocks.NewMockMongoClient()
 
@@ -1440,11 +1432,9 @@ func TestConfigBasedMiddleware(t *testing.T) {
 	}
 }
 
-// Test API versioning
 func TestAPIVersioning(t *testing.T) {
 	router, _ := createTestRouter()
 
-	// Test that v1 routes work
 	v1Routes := []string{
 		"/api/v1/info",
 		"/api/v1/status",
@@ -1464,7 +1454,6 @@ func TestAPIVersioning(t *testing.T) {
 		})
 	}
 
-	// Test that non-versioned API routes don't work
 	nonVersionedRoutes := []string{
 		"/api/info",
 		"/api/status",
@@ -1485,12 +1474,7 @@ func TestAPIVersioning(t *testing.T) {
 	}
 }
 
-// Test request timeout handling
 func TestRequestTimeoutHandling(t *testing.T) {
-	// This test would require a slow handler to test timeout middleware
-	// Since we're using mocks, we can't easily simulate slow responses
-	// But we can test that the timeout middleware is applied
-
 	router, _ := createTestRouter()
 
 	req, _ := http.NewRequest("GET", "/health", nil)
@@ -1498,13 +1482,11 @@ func TestRequestTimeoutHandling(t *testing.T) {
 
 	router.ServeHTTP(w, req)
 
-	// The request should complete normally (not timeout)
 	if w.Code != http.StatusOK {
 		t.Errorf("Expected normal completion, got status %d", w.Code)
 	}
 }
 
-// Test route security
 func TestRouteSecurity(t *testing.T) {
 	router, _ := createTestRouter()
 
@@ -1513,7 +1495,6 @@ func TestRouteSecurity(t *testing.T) {
 
 	router.ServeHTTP(w, req)
 
-	// Check security headers
 	securityHeaders := map[string]string{
 		"X-Content-Type-Options": "nosniff",
 		"X-Frame-Options":        "DENY",
